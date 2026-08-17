@@ -1,0 +1,33 @@
+name: Portfolio Selenium Focus QA
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/selenium-focus-v16.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install QA dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk >/dev/null
+          python -m pip install -q selenium
+          fc-cache -f
+      - name: Run focused QA
+        run: |
+          mkdir -p qa2
+          python3 -m http.server 8000 >/tmp/portfolio-http.log 2>&1 &
+          sleep 2
+          python .github/scripts/selenium_focus_v16.py
+          ls -lh qa2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-selenium-focus-v16
+          path: qa2/
