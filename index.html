@@ -588,6 +588,9 @@
     .media-video{width:100%;height:100%;display:block;object-fit:cover;object-position:center top;background:#0a0e14}
     .single-real-screen .media-video,.phone-demo .media-video{object-fit:contain}
     /* PERF_V12_END */
+
+    /* PERF_V12_A11Y */
+    a:focus-visible,button:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
   </style>
 <!-- SEO_V11_START --><meta name="author" content="모세종"><link rel="canonical" href="https://mosejong.github.io/"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><meta property="og:type" content="website"><meta property="og:url" content="https://mosejong.github.io/"><meta property="og:image" content="https://mosejong.github.io/assets/og/portfolio.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="ko_KR"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="모세종 | Python · FastAPI AI Backend Developer"><meta name="twitter:description" content="물류·운영 경험을 바탕으로 Python · FastAPI로 API, DB, AI 기능을 연결하고 테스트와 수치로 검증하는 AI 백엔드 개발자 모세종의 포트폴리오."><meta name="twitter:image" content="https://mosejong.github.io/assets/og/portfolio.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"모세종","url":"https://mosejong.github.io/","sameAs":["https://github.com/mosejong"],"jobTitle":"AI Service Backend Developer","knowsAbout":["Python","FastAPI","PostgreSQL","Redis","RAG","LLM Integration","Docker","pytest","GitHub Actions"]}</script><!-- SEO_V11_END --></head>
 <body>
@@ -895,7 +898,7 @@
     <div class="rainbow-stage">
       <div class="single-real-screen rainbow-screen phone-demo">
         <video class="media-video" data-demo-video muted loop playsinline preload="none" poster="assets/projects/rainbow-bridge-demo-poster.webp" aria-label="Rainbow Bridge 실제 모바일 서비스 데모"><source src="assets/projects/rainbow-bridge-demo.mp4" type="video/mp4"></video>
-        <span class="screen-chip sim">LIVE DEMO GIF</span>
+        <span class="screen-chip sim">LIVE DEMO</span>
       </div>
       <div class="rainbow-flow" aria-label="Rainbow Bridge service flow">
         <div class="flow-step"><b>01</b><span>EMOTION<br>CHECK-IN</span></div>
