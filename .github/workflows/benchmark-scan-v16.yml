@@ -19,7 +19,9 @@ jobs:
           fetch-depth: 0
 
       - name: Apply benchmark patch
-        run: python .github/scripts/benchmark_scan_v16.py
+        run: |
+          python .github/scripts/benchmark_scan_v16.py
+          sed -i 's/[[:space:]]\+$//' index.html assets/case-study.css
 
       - name: Validate content
         run: |
