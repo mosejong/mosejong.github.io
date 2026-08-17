@@ -1,0 +1,61 @@
+name: Portfolio Scanability v1.6
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/benchmark-scan-v16.yml"
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  patch-and-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Apply benchmark patch
+        run: python .github/scripts/benchmark_scan_v16.py
+
+      - name: Validate content
+        run: |
+          git diff --check
+          grep -q "문제를 구조화합니다" index.html
+          grep -q "RAG top-1 오염률 12.5% → 0%" index.html
+          grep -q "TEAM VALIDATION" index.html
+          grep -q "100,083 G2B bid records" index.html
+          grep -q "result scanability: meaning before number" assets/case-study.css
+
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets/case-study.css
+          git commit -m "design: improve recruiter scanability from portfolio benchmarks"
+          git push
+
+      - name: Capture visual QA
+        run: |
+          python3 -m http.server 8000 >/tmp/portfolio-http.log 2>&1 &
+          sleep 2
+          CHROME=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)
+          if [ -z "$CHROME" ]; then
+            echo "Chrome not found; skipping screenshots"
+            exit 0
+          fi
+          mkdir -p qa
+          "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size=1440,6200 --screenshot=qa/home-desktop.png http://127.0.0.1:8000/ || true
+          "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size=390,7000 --screenshot=qa/home-mobile.png http://127.0.0.1:8000/ || true
+          "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --window-size=1440,4200 --screenshot=qa/jobiverse-desktop.png http://127.0.0.1:8000/projects/jobiverse.html || true
+          ls -lh qa || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: portfolio-scanability-v16-qa
+          path: qa/
+          if-no-files-found: ignore
