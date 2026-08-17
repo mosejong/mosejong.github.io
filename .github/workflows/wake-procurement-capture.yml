@@ -32,7 +32,6 @@ jobs:
           from selenium import webdriver
           from selenium.webdriver.common.by import By
           from selenium.webdriver.chrome.options import Options
-          from selenium.webdriver.support.ui import WebDriverWait
 
           url = os.environ['APP_URL']
           out = Path(os.environ['GITHUB_WORKSPACE']) / 'assets/projects/procurement-home.png'
@@ -45,64 +44,87 @@ jobs:
           opts.add_argument('--window-size=1440,900')
           opts.add_argument('--hide-scrollbars')
 
+          def body_text(driver):
+              try:
+                  return driver.find_element(By.TAG_NAME, 'body').text
+              except Exception:
+                  return ''
+
+          def is_sleep_page(text):
+              t = text.lower()
+              return 'zzzz' in t or 'gone to sleep' in t or 'get this app back up' in t
+
+          def is_live_streamlit(driver, text):
+              source = driver.page_source
+              return (not is_sleep_page(text) and len(text.strip()) > 80 and
+                      ('data-testid="stApp"' in source or 'stApp' in source or 'streamlit' in source.lower()))
+
           driver = webdriver.Chrome(options=opts)
-          wait = WebDriverWait(driver, 60)
           try:
               driver.get(url)
-              time.sleep(4)
+              time.sleep(5)
+              text = body_text(driver)
 
-              # Streamlit Community Cloud sleep page: click wake-up button if present.
-              wake_texts = [
-                  "Yes, get this app back up!",
-                  "Get this app back up",
-                  "Wake up",
-              ]
-              clicked = False
-              for text in wake_texts:
-                  try:
-                      buttons = driver.find_elements(By.XPATH, f"//*[contains(normalize-space(.), '{text}')]")
-                      for el in buttons:
-                          if el.is_displayed():
-                              driver.execute_script("arguments[0].click();", el)
-                              clicked = True
-                              print('Clicked wake control:', text)
-                              break
-                  except Exception:
-                      pass
-                  if clicked:
-                      break
-
-              # Give the app time to boot, periodically refresh if the sleep page remains.
-              deadline = time.time() + 150
-              last = ''
-              while time.time() < deadline:
-                  time.sleep(5)
-                  body = driver.find_element(By.TAG_NAME, 'body').text
-                  last = body[:800]
-                  asleep = ('Zzzz' in body or 'gone to sleep' in body or 'get this app back up' in body.lower())
-                  streamlit_ready = ('stApp' in driver.page_source or 'data-testid="stApp"' in driver.page_source)
-                  if not asleep and streamlit_ready and len(body.strip()) > 40:
-                      print('Live Streamlit app detected.')
-                      break
-                  if asleep and not clicked:
-                      # Try once more after dynamic content settles.
+              if is_sleep_page(text):
+                  clicked = False
+                  for xpath in [
+                      "//button[contains(., 'get this app back up')]",
+                      "//a[contains(., 'get this app back up')]",
+                      "//*[contains(normalize-space(.), 'Yes, get this app back up!')]",
+                  ]:
                       try:
-                          el = driver.find_element(By.XPATH, "//*[contains(normalize-space(.), 'get this app back up')]")
-                          driver.execute_script("arguments[0].click();", el)
-                          clicked = True
-                          print('Clicked wake control on retry.')
+                          for el in driver.find_elements(By.XPATH, xpath):
+                              if el.is_displayed():
+                                  driver.execute_script("arguments[0].click();", el)
+                                  clicked = True
+                                  print('Wake-up control clicked')
+                                  break
                       except Exception:
                           pass
-                  print('Waiting for app...')
-              else:
-                  raise RuntimeError('App did not become ready. Last body text: ' + last)
+                      if clicked:
+                          break
 
+              # Community Cloud can keep the sleep page visible after the wake request.
+              # Refresh periodically and accept only a real Streamlit app screen.
+              deadline = time.time() + 240
+              attempt = 0
+              last = ''
+              while time.time() < deadline:
+                  attempt += 1
+                  time.sleep(10)
+                  driver.get(url)
+                  time.sleep(5)
+                  text = body_text(driver)
+                  last = text[:1000]
+                  print(f'poll {attempt}: {last[:120]!r}')
+
+                  if is_live_streamlit(driver, text):
+                      print('Live Streamlit app detected')
+                      break
+
+                  if is_sleep_page(text):
+                      # Re-issue wake request if the Community Cloud page still presents it.
+                      try:
+                          controls = driver.find_elements(By.XPATH, "//*[contains(normalize-space(.), 'get this app back up')]")
+                          for el in controls:
+                              if el.is_displayed():
+                                  driver.execute_script("arguments[0].click();", el)
+                                  print('Wake-up control clicked again')
+                                  break
+                      except Exception:
+                          pass
+              else:
+                  raise RuntimeError('App did not wake in time. Last page text: ' + last)
+
+              time.sleep(12)
+              driver.get(url)
               time.sleep(8)
+              text = body_text(driver)
+              if not is_live_streamlit(driver, text):
+                  raise RuntimeError('Refusing to save non-live Streamlit screen: ' + text[:500])
+
               driver.execute_script('window.scrollTo(0,0)')
               time.sleep(2)
-              body = driver.find_element(By.TAG_NAME, 'body').text
-              if 'Zzzz' in body or 'gone to sleep' in body or 'get this app back up' in body.lower():
-                  raise RuntimeError('Refusing to save sleeping Streamlit screen')
               driver.save_screenshot(str(out))
               print('Saved live app capture:', out, out.stat().st_size)
           finally:
