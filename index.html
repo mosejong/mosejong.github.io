@@ -423,7 +423,7 @@
       .award-modal-close{right:5px;top:5px}
     }
 
-  
+
     /* Featured real-project case study */
     .project-featured-real{min-height:560px;grid-template-columns:.9fr 1.1fr;border-color:rgba(130,215,255,.16);background:linear-gradient(135deg,rgba(130,215,255,.055),rgba(255,255,255,.025) 42%,rgba(140,245,210,.025))}
     .project-featured-real .project-copy{padding:36px 34px}
@@ -454,8 +454,8 @@
     .visual-caption{position:absolute;z-index:3;right:25px;bottom:18px;display:flex;gap:14px;color:#657386;font:750 7px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.07em}
     @media(max-width:980px){.project-featured-real{grid-template-columns:1fr}.real-visual{border-left:0;border-top:1px solid rgba(255,255,255,.075);min-height:500px}}
     @media(max-width:680px){.project-featured-real .project-copy{padding:25px 22px 28px}.role-grid{grid-template-columns:1fr}.role-box.wide{grid-column:auto}.real-visual{min-height:390px;padding:28px 15px 20px}.screen-stack{height:320px}.product-screen.main{width:88%;height:73%}.product-screen.secondary{width:60%;height:46%}.visual-caption{right:15px;gap:8px}}
-    
-  
+
+
     /* Real project cards v2 */
     .project-real{min-height:560px;grid-template-columns:.92fr 1.08fr;background:linear-gradient(135deg,rgba(255,255,255,.047),rgba(255,255,255,.022));}
     .project-real .project-copy{padding:35px 34px}
@@ -477,8 +477,8 @@
     .frame-fallback{position:absolute;right:10px;bottom:10px;padding:8px 10px;border-radius:9px;background:rgba(7,10,15,.88);border:1px solid rgba(255,255,255,.1);font:800 8px ui-monospace,SFMono-Regular,Menlo,monospace;color:#dce5ed;backdrop-filter:blur(8px)}
     @media(max-width:980px){.project-real{grid-template-columns:1fr}.real-project-visual{border-left:0;border-top:1px solid rgba(255,255,255,.075);min-height:500px}}
     @media(max-width:680px){.project-real .project-copy{padding:25px 22px 28px}.real-project-visual{min-height:390px;padding:38px 15px 20px}.single-real-screen,.phone-demo,.live-frame-wrap{width:100%;height:320px;max-height:320px}.single-real-screen img{max-height:320px}.phone-demo img{height:100%}}
-    
-  
+
+
     /* Captured project visuals v4 */
     .school-capture-visual,.procurement-capture-visual{min-height:590px}
     .school-shot-stage{position:relative;z-index:2;width:100%;height:465px;display:flex;align-items:center;justify-content:center;perspective:1200px}
@@ -499,7 +499,7 @@
     @media(max-width:980px){.school-capture-visual,.procurement-capture-visual{min-height:530px}.school-shot-stage{height:420px}.browser-capture{height:410px}}
     @media(max-width:680px){.school-capture-visual,.procurement-capture-visual{min-height:400px}.school-shot-stage{height:305px}.school-shot{width:92%}.parent-shot{transform:translate(-18px,-14px)}.teacher-shot{width:68%;transform:translate(72px,82px) rotateZ(2deg)}.browser-capture{width:100%;height:310px}.browser-capture-bar{height:36px}.browser-capture-body{height:calc(100% - 36px)}}
 
-  
+
 
     /* Portfolio v1.0 visual polish */
     .project-list{gap:24px}
@@ -610,6 +610,29 @@
 
     /* PERF_V12_A11Y */
     a:focus-visible,button:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+
+
+    /* v1.6 — recruiter scanability */
+    .work-principles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:-2px 0 22px}
+    .work-principle{min-height:150px;padding:19px 20px;border:1px solid rgba(255,255,255,.09);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.022));position:relative;overflow:hidden}
+    .work-principle:after{content:"";position:absolute;width:150px;height:150px;right:-72px;bottom:-88px;border-radius:50%;background:radial-gradient(circle,rgba(130,215,255,.10),transparent 67%)}
+    .work-principle small{display:block;color:var(--mint);font:800 9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.11em;margin-bottom:18px}
+    .work-principle strong{display:block;font-size:17px;letter-spacing:-.035em;margin-bottom:8px}
+    .work-principle span{display:block;color:#8794a5;font-size:12px;line-height:1.65;max-width:290px}
+    .project:before{content:attr(data-index);position:absolute;z-index:1;right:52%;top:13px;font:900 86px/1 Inter,Pretendard,"Noto Sans KR",sans-serif;letter-spacing:-.08em;color:rgba(255,255,255,.035);pointer-events:none;user-select:none}
+    .scan-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .scan-grid .role-box{min-height:86px;padding:13px 12px;display:flex;flex-direction:column;justify-content:space-between}
+    .scan-grid .role-box.wide{grid-column:auto}
+    .scan-grid .role-box small{margin-bottom:10px}
+    .scan-grid .role-box strong{font-size:11px;line-height:1.45}
+    .scan-grid .role-box.signal{border-color:rgba(140,245,210,.16);background:rgba(140,245,210,.035)}
+    .scan-grid .role-box.signal small,.scan-grid .role-box.signal strong{color:#b9f7e3}
+    .scan-grid .role-box.proof{border-color:rgba(130,215,255,.16);background:rgba(130,215,255,.032)}
+    .scan-grid .role-box.proof small{color:#79a8c3}.scan-grid .role-box.proof strong{color:#d7edf8}
+    .supporting-metrics{margin-top:15px}
+    @media(max-width:980px){.project:before{right:24px;top:18px}.work-principles{grid-template-columns:1fr 1fr}.work-principle:last-child{grid-column:span 2}}
+    @media(max-width:680px){.work-principles{grid-template-columns:1fr}.work-principle:last-child{grid-column:auto}.work-principle{min-height:0}.scan-grid{grid-template-columns:1fr}.scan-grid .role-box{min-height:0}.project:before{font-size:68px;right:18px;top:13px}}
+
   </style>
 <!-- SEO_V11_START --><meta name="author" content="모세종"><link rel="canonical" href="https://mosejong.github.io/"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><meta property="og:type" content="website"><meta property="og:url" content="https://mosejong.github.io/"><meta property="og:image" content="https://mosejong.github.io/assets/og/portfolio.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="ko_KR"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="모세종 | Python · FastAPI AI Backend Developer"><meta name="twitter:description" content="물류·운영 경험을 바탕으로 Python · FastAPI로 API, DB, AI 기능을 연결하고 테스트와 수치로 검증하는 AI 백엔드 개발자 모세종의 포트폴리오."><meta name="twitter:image" content="https://mosejong.github.io/assets/og/portfolio.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"모세종","url":"https://mosejong.github.io/","sameAs":["https://github.com/mosejong"],"jobTitle":"AI Service Backend Developer","knowsAbout":["Python","FastAPI","PostgreSQL","Redis","RAG","LLM Integration","Docker","pytest","GitHub Actions"]}</script><!-- SEO_V11_END --></head>
 <body>
@@ -749,6 +772,12 @@
           <p class="section-note">사용한 기술보다, 무엇을 개선했고 어떤 기준으로 검증했는지를 먼저 보여줍니다.</p>
         </div>
 
+        <div class="work-principles reveal" aria-label="개발 방식 요약">
+          <div class="work-principle"><small>01 · STRUCTURE</small><strong>문제를 구조화합니다.</strong><span>운영에서 흐름과 병목을 보던 방식으로 API·DB·데이터 흐름을 정리합니다.</span></div>
+          <div class="work-principle"><small>02 · VERIFY</small><strong>수치로 확인합니다.</strong><span>성능·품질·안전·회귀 조건을 테스트와 지표로 확인합니다.</span></div>
+          <div class="work-principle"><small>03 · CONNECT</small><strong>끝까지 연결합니다.</strong><span>AI 기능을 단독 데모로 두지 않고 실제 사용자 흐름과 서비스 동작으로 연결합니다.</span></div>
+        </div>
+
         <div class="bento">
           <div class="bento-card big reveal">
             <div class="bento-label">RAG job contamination</div>
@@ -804,7 +833,7 @@
         </div>
 
         <div class="project-list">
-          <article class="project project-featured-real reveal tilt">
+          <article class="project project-featured-real reveal tilt" data-index="01">
             <div class="project-copy">
               <div>
                 <div class="project-meta"><span class="tag gold">🏆 GRAND PRIZE</span><span class="tag">REPORTING · DATA PIPELINE</span></div>
@@ -812,17 +841,16 @@
                 <h3>Jobiverse</h3>
                 <p>AI 상담 → 가상 직무 체험 → 근거 기반 적합도 리포트로 이어지는 진로 탐색 플랫폼. <b style="color:#dfe7ef">리포트·추천 근거·외부 데이터·검증 흐름</b>을 맡아 체험 결과를 설명 가능한 리포트로 연결했습니다.</p>
 
-                <div class="role-grid">
+                <div class="role-grid scan-grid">
                   <div class="role-box"><small>MY ROLE</small><strong>Reporting · Data Pipeline</strong></div>
-                  <div class="role-box"><small>STACK</small><strong>FastAPI · PostgreSQL · pgvector</strong></div>
-                  <div class="role-box wide"><small>WHAT I OWNED</small><strong>역량 레이더 · AI 해석 · 근거 각주 · PDF · 공공 API · CI</strong></div>
+                  <div class="role-box signal"><small>KEY RESULT</small><strong>RAG top-1 오염률 12.5% → 0%</strong></div>
+                  <div class="role-box proof"><small>VALIDATION</small><strong>564 project backend tests</strong></div>
                 </div>
 
-                <div class="project-metrics">
-                  <span class="metric">RAG contamination <b>12.5% → 0%</b></span>
+                <div class="project-metrics supporting-metrics">
                   <span class="metric">embedding p90 <b>1.3s → 0.4s</b></span>
                   <span class="metric">RAG evidence <b>95% → 100%</b></span>
-                  <span class="metric">project tests <b>564</b></span>
+                  <span class="metric">stack <b>FastAPI · PostgreSQL · pgvector</b></span>
                 </div>
 
                 <div class="featured-actions">
@@ -847,23 +875,22 @@
             </div>
           </article>
 
-          <article class="project project-real project-school reveal tilt">
+          <article class="project project-real project-school reveal tilt" data-index="02">
   <div class="project-copy">
     <div>
       <div class="project-meta"><span class="tag gold">🏆 BEST PROJECT</span><span class="tag">TRANSLATION · TTS PIPELINE</span></div>
       <div class="project-eyeline">MULTILINGUAL SCHOOL NOTICE AI</div>
       <h3>SchoolBridge</h3>
       <p>가정통신문의 날짜·금액·준비물처럼 놓치면 안 되는 정보를 보존하면서 8개 언어 번역과 음성 안내로 연결한 서비스입니다. <b style="color:#dfe7ef">NLLB 번역·학교 용어사전·번역 검수 루프·Edge-TTS</b>를 맡아 번역 품질을 39.0 → 89.6으로 개선했습니다.</p>
-      <div class="role-grid">
+      <div class="role-grid scan-grid">
         <div class="role-box"><small>MY ROLE</small><strong>Translation · TTS Pipeline</strong></div>
-        <div class="role-box"><small>STACK</small><strong>NLLB · Transformers · Edge-TTS</strong></div>
-        <div class="role-box wide"><small>WHAT I OWNED</small><strong>8개 언어 번역 · 학교 용어사전 · 핵심정보 보존 · Round-trip 검수 · 음성 출력</strong></div>
+        <div class="role-box signal"><small>KEY RESULT</small><strong>번역 품질 39.0 → 89.6</strong></div>
+        <div class="role-box proof"><small>VALIDATION</small><strong>Android 실기기 E2E</strong></div>
       </div>
-      <div class="project-metrics">
-        <span class="metric">quality <b>39.0 → 89.6</b></span>
+      <div class="project-metrics supporting-metrics">
         <span class="metric">languages <b>8</b></span>
-        <span class="metric">backend tests <b>27</b></span>
-        <span class="metric"><b>실기기 E2E 검증</b></span>
+        <span class="metric">project backend tests <b>27</b></span>
+        <span class="metric">stack <b>NLLB · Transformers · Edge-TTS</b></span>
       </div>
       <div class="featured-actions">
         <a class="project-btn primary" href="projects/schoolbridge.html">View Case Study →</a>
@@ -888,23 +915,22 @@
   </div>
 </article>
 
-<article class="project project-real project-rainbow reveal tilt">
+<article class="project project-real project-rainbow reveal tilt" data-index="03">
   <div class="project-copy">
     <div>
       <div class="project-meta"><span class="tag">TEAM LEAD</span><span class="tag">BACKEND INTEGRATION</span></div>
       <div class="project-eyeline">AI PET-LOSS AFTERCARE SERVICE</div>
       <h3>Rainbow Bridge</h3>
       <p>감정 체크인 → 추모 메시지·TTS → 회복 미션 → 타임라인·리포트로 이어지는 AI 펫로스 애프터케어 서비스. <b style="color:#dfe7ef">팀 운영·API 통합·서버 운영·사용자 시연 흐름</b>을 맡아 각 기능을 하나의 모바일 여정으로 연결했습니다.</p>
-      <div class="role-grid">
+      <div class="role-grid scan-grid">
         <div class="role-box"><small>MY ROLE</small><strong>Team Lead · Backend Integration</strong></div>
-        <div class="role-box"><small>STACK</small><strong>FastAPI · NCP · Docker · nginx</strong></div>
-        <div class="role-box wide"><small>WHAT I OWNED</small><strong>우선순위 조율 · API 흐름 통합 · 서버 운영 · CI/CD · Expo 모바일 시연</strong></div>
+        <div class="role-box signal"><small>KEY RESULT</small><strong>핵심 API · 회복 흐름 통합</strong></div>
+        <div class="role-box proof"><small>TEAM VALIDATION</small><strong>Safety routing 40 / 40</strong></div>
       </div>
-      <div class="project-metrics">
-        <span class="metric">team safety routing <b>40/40</b></span>
+      <div class="project-metrics supporting-metrics">
         <span class="metric">team G-Eval <b>4.76–4.83 / 5</b></span>
         <span class="metric">team lip-sync <b>0.896</b></span>
-        <span class="metric"><b>6-person team</b></span>
+        <span class="metric">stack <b>FastAPI · NCP · Docker · nginx</b></span>
       </div>
       <div class="featured-actions">
         <a class="project-btn primary" href="projects/rainbow-bridge.html">View Case Study →</a>
@@ -930,7 +956,7 @@
   </div>
 </article>
 
-<article class="project project-real project-procurement reveal tilt">
+<article class="project project-real project-procurement reveal tilt" data-index="04">
   <div class="project-copy">
     <div>
       <div class="project-meta"><span class="tag">SOLO PRODUCT</span><span class="tag">PUBLIC DATA · ML</span></div>
@@ -938,16 +964,15 @@
       <h3>Procurement<br>Logistics AI</h3>
       <p>물류 현장에서 쌓은 수요·납품·거점 판단을 공공데이터 제품으로 옮긴 개인 프로젝트입니다. <b style="color:#dfe7ef">문제 정의부터 데이터 수집·분류·지표·AI 해석·대시보드</b>까지 전 과정을 구현했습니다.</p>
       <div class="origin-note"><small>FIELD → PRODUCT</small><strong>8년 9개월 물류·운영 경험을 공공 수요와 거점 판단 데이터 제품으로 전환</strong></div>
-      <div class="role-grid">
+      <div class="role-grid scan-grid">
         <div class="role-box"><small>MY ROLE</small><strong>Solo Product · Data Pipeline</strong></div>
-        <div class="role-box"><small>STACK</small><strong>Python · Pandas · Scikit-learn · Streamlit</strong></div>
-        <div class="role-box wide"><small>WHAT I OWNED</small><strong>6개 기관 9개 소스 · 전국 수요 분석 · TF-IDF/LogReg · Gemini 해석 · 물류 거점 지표</strong></div>
+        <div class="role-box signal"><small>KEY RESULT</small><strong>Classification accuracy 98.6%</strong></div>
+        <div class="role-box proof"><small>VALIDATION</small><strong>100,083 G2B bid records</strong></div>
       </div>
-      <div class="project-metrics">
-        <span class="metric">bids <b>100,083</b></span>
-        <span class="metric">aT bid/award <b>734,242</b></span>
-        <span class="metric">classification accuracy <b>98.6%</b></span>
-        <span class="metric"><b>대면심사 진출</b></span>
+      <div class="project-metrics supporting-metrics">
+        <span class="metric">aT bid + award <b>734,242</b></span>
+        <span class="metric">data sources <b>6 agencies / 9 sources</b></span>
+        <span class="metric">stack <b>Python · Pandas · Scikit-learn · Streamlit</b></span>
       </div>
       <div class="featured-actions">
         <a class="project-btn primary" href="projects/procurement-logistics-ai.html">View Case Study →</a>
