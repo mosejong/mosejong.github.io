@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#070a0f" />
+  <meta name="description" content="모세종 | Python · FastAPI 기반 AI 서비스 백엔드 개발자 포트폴리오" />
+  <meta property="og:title" content="모세종 | AI Backend Developer" />
+  <meta property="og:description" content="현장의 문제를 데이터 흐름으로 정리하고, 코드와 AI로 해결합니다." />
+  <title>MOSEJONG — AI Backend Developer</title>
+
+  <style>
+    :root{
+      --bg:#070a0f;
+      --bg-soft:#0b1017;
+      --panel:rgba(255,255,255,.050);
+      --panel-2:rgba(255,255,255,.032);
+      --line:rgba(255,255,255,.105);
+      --line-strong:rgba(255,255,255,.18);
+      --text:#f7f9fc;
+      --muted:#95a0b1;
+      --muted-2:#657184;
+      --mint:#8cf5d2;
+      --cyan:#82d7ff;
+      --violet:#aa97ff;
+      --amber:#ffd68a;
+      --pink:#ff9cb0;
+      --radius:28px;
+      --shadow:0 28px 90px rgba(0,0,0,.35);
+      --mx:50vw;
+      --my:30vh;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--bg)}
+    body{
+      margin:0;color:var(--text);background:var(--bg);
+      font-family:Inter, Pretendard, "Noto Sans KR", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing:-.016em;overflow-x:hidden;
+    }
+    ::selection{background:rgba(140,245,210,.23);color:#fff}
+    a{color:inherit;text-decoration:none}
+    button,a{ -webkit-tap-highlight-color:transparent }
+    .page-noise,.page-grid,.spotlight{position:fixed;inset:0;pointer-events:none}
+    .page-grid{
+      z-index:-3;opacity:.36;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+      background-size:64px 64px;
+      mask-image:linear-gradient(to bottom,rgba(0,0,0,.8),transparent 72%);
+    }
+    .spotlight{
+      z-index:-2;
+      background:
+        radial-gradient(700px circle at var(--mx) var(--my),rgba(130,215,255,.10),transparent 42%),
+        radial-gradient(520px circle at calc(var(--mx) - 220px) calc(var(--my) + 110px),rgba(140,245,210,.075),transparent 44%),
+        radial-gradient(720px circle at 88% 3%,rgba(170,151,255,.09),transparent 45%);
+    }
+    .page-noise{
+      z-index:9999;opacity:.18;mix-blend-mode:soft-light;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.10'/%3E%3C/svg%3E")
+    }
+
+    .wrap{width:min(1200px,calc(100% - 40px));margin-inline:auto}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);font-size:12px;color:#c8d0db}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 18px rgba(140,245,210,.9)}
+    .nav{
+      position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:60;width:min(930px,calc(100% - 28px));
+      border:1px solid rgba(255,255,255,.11);background:rgba(9,13,19,.66);backdrop-filter:blur(20px) saturate(1.2);
+      border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.22)
+    }
+    .nav-in{height:58px;padding:0 14px 0 18px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:13px;letter-spacing:.02em}
+    .brand-mark{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,#eef3f7,#9ea8b7);color:#080b10;font-size:11px;box-shadow:0 7px 20px rgba(255,255,255,.10)}
+    .nav-links{display:flex;align-items:center;gap:5px}
+    .nav-links a{padding:9px 11px;border-radius:11px;color:#a7b1bf;font-size:12px;transition:.2s}
+    .nav-links a:hover{color:#fff;background:rgba(255,255,255,.055)}
+    .nav-links .contact{color:#091015;background:#f3f7fb;font-weight:800}
+    .nav-links .contact:hover{color:#091015;background:#fff}
+
+    .hero{min-height:100svh;padding:145px 0 80px;display:flex;align-items:center}
+    .hero-grid{display:grid;grid-template-columns:1.18fr .82fr;gap:52px;align-items:center}
+    .hero-kicker{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+    .hero-kicker span:last-child{font-size:12px;color:#aab5c3}
+    h1{
+      margin:0;font-size:clamp(54px,7.6vw,108px);line-height:.94;letter-spacing:-.072em;font-weight:900;max-width:860px
+    }
+    .hero-muted{color:#7f8998}
+    .hero-accent{
+      background:linear-gradient(110deg,#fff 6%,#dfe8f1 34%,var(--mint) 66%,var(--cyan) 92%);
+      -webkit-background-clip:text;background-clip:text;color:transparent
+    }
+    .hero-copy{font-size:clamp(16px,1.7vw,20px);line-height:1.8;color:#9faaba;max-width:720px;margin:28px 0 31px}
+    .hero-copy strong{color:#e6edf4;font-weight:700}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:45px;padding:0 16px;border-radius:13px;
+      border:1px solid var(--line);font-weight:800;font-size:13px;transition:.22s cubic-bezier(.2,.8,.2,1)
+    }
+    .btn.primary{background:#f4f7fa;color:#0a0e13;border-color:#f4f7fa}
+    .btn.ghost{background:rgba(255,255,255,.035);color:#d7dee8}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 13px 35px rgba(0,0,0,.28)}
+    .micro{margin-top:22px;color:#687486;font-size:11px;display:flex;gap:16px;flex-wrap:wrap}
+    .micro span{display:inline-flex;align-items:center;gap:6px}
+    .micro svg{opacity:.65}
+
+    .system-card{
+      border-radius:32px;border:1px solid var(--line);background:
+        linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.022));
+      box-shadow:var(--shadow);overflow:hidden;position:relative;min-height:610px;isolation:isolate
+    }
+    .system-card:before{
+      content:"";position:absolute;inset:-35%;z-index:-2;
+      background:conic-gradient(from 20deg,transparent 0 22%,rgba(140,245,210,.10),transparent 42% 64%,rgba(130,215,255,.09),transparent 78%);
+      animation:slowSpin 26s linear infinite
+    }
+    .system-card:after{
+      content:"";position:absolute;inset:1px;border-radius:31px;z-index:-1;
+      background:linear-gradient(180deg,rgba(7,10,15,.55),rgba(7,10,15,.88))
+    }
+    @keyframes slowSpin{to{transform:rotate(360deg)}}
+    .windowbar{height:52px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+    .lights{display:flex;gap:7px}.lights i{width:8px;height:8px;border-radius:50%;background:#3c4654}.lights i:nth-child(1){background:#f47f77}.lights i:nth-child(2){background:#f0c66f}.lights i:nth-child(3){background:#71d59a}
+    .windowbar span{font:600 11px ui-monospace,SFMono-Regular,Menlo,monospace;color:#748094}
+    .pipeline{padding:24px;display:grid;gap:14px}
+    .node{
+      border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.036);border-radius:17px;padding:16px 17px;
+      display:grid;grid-template-columns:40px 1fr auto;gap:13px;align-items:center;position:relative;overflow:hidden
+    }
+    .node:before{
+      content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(var(--mint),transparent);
+      opacity:.65
+    }
+    .node-icon{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.10);display:grid;place-items:center;background:rgba(255,255,255,.045);font-size:16px}
+    .node strong{display:block;font-size:13px;margin-bottom:4px}
+    .node small{display:block;color:#778397;font:500 10px ui-monospace,SFMono-Regular,Menlo,monospace}
+    .node-state{font:700 10px ui-monospace,SFMono-Regular,Menlo,monospace;color:#a9f1d8;padding:6px 8px;border-radius:8px;background:rgba(140,245,210,.06);border:1px solid rgba(140,245,210,.14)}
+    .flow-line{height:14px;position:relative}
+    .flow-line:before{content:"";position:absolute;left:43px;top:-7px;bottom:-7px;width:1px;background:rgba(255,255,255,.10)}
+    .flow-line:after{
+      content:"";position:absolute;left:40px;top:0;width:7px;height:7px;border-radius:50%;background:var(--mint);
+      box-shadow:0 0 18px rgba(140,245,210,.8);animation:flow 1.6s ease-in-out infinite
+    }
+    @keyframes flow{0%,100%{transform:translateY(-6px);opacity:.45}50%{transform:translateY(8px);opacity:1}}
+    .console{
+      margin:8px 24px 24px;border-radius:17px;border:1px solid rgba(255,255,255,.09);background:#080b10;padding:17px;
+      font:500 10px/1.8 ui-monospace,SFMono-Regular,Menlo,monospace;color:#7f8b9d
+    }
+    .console .ok{color:#9fe7cc}.console .key{color:#8fcfff}.console .num{color:#d2bbff}
+    .cursor{display:inline-block;width:6px;height:12px;background:#8cf5d2;vertical-align:-2px;animation:blink 1s steps(2) infinite}
+    @keyframes blink{50%{opacity:0}}
+
+    .section{padding:105px 0}
+    .section-top{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;margin-bottom:35px}
+    .section-kicker{font:800 11px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--mint);letter-spacing:.12em;text-transform:uppercase}
+    h2{font-size:clamp(36px,5.2vw,66px);line-height:1.02;letter-spacing:-.06em;margin:10px 0 0}
+    .section-note{max-width:475px;color:#8f9aaa;font-size:14px;line-height:1.75;margin:0}
+    .bento{display:grid;grid-template-columns:1.15fr .85fr .85fr;grid-auto-rows:210px;gap:14px}
+    .bento-card{
+      border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.025));
+      padding:22px;position:relative;overflow:hidden
+    }
+    .bento-card:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-110px;bottom:-150px;background:radial-gradient(circle,rgba(130,215,255,.11),transparent 65%)}
+    .bento-card.big{grid-row:span 2}
+    .bento-card.wide{grid-column:span 2}
+    .bento-label{font:700 10px ui-monospace,SFMono-Regular,Menlo,monospace;color:#7f8a99;text-transform:uppercase;letter-spacing:.08em}
+    .impact{font-size:clamp(42px,5vw,78px);letter-spacing:-.07em;font-weight:900;margin-top:23px}
+    .impact small{font-size:.33em;color:#788496;font-weight:700;margin-left:4px}
+    .impact .accent{color:var(--mint)}
+    .bento-copy{color:#8f9aab;font-size:13px;line-height:1.65;margin-top:8px;max-width:360px}
+    .chart{position:absolute;left:22px;right:22px;bottom:19px;height:72px;display:flex;align-items:flex-end;gap:7px}
+    .bar{flex:1;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,rgba(140,245,210,.88),rgba(140,245,210,.10));border:1px solid rgba(140,245,210,.13);transform-origin:bottom;animation:bars 1.1s cubic-bezier(.2,.8,.2,1) both}
+    .bar:nth-child(1){height:42%;animation-delay:.02s}.bar:nth-child(2){height:67%;animation-delay:.06s}.bar:nth-child(3){height:55%;animation-delay:.10s}.bar:nth-child(4){height:84%;animation-delay:.14s}.bar:nth-child(5){height:73%;animation-delay:.18s}.bar:nth-child(6){height:100%;animation-delay:.22s}
+    @keyframes bars{from{transform:scaleY(.08);opacity:.2}}
+    .award-card{display:flex;flex-direction:column;justify-content:space-between}
+    .award-title{font-size:23px;line-height:1.15;letter-spacing:-.04em;font-weight:850;margin-top:12px}
+    .award-card .trophy{font-size:42px;filter:drop-shadow(0 8px 28px rgba(255,214,138,.13))}
+    .workstyle{display:flex;flex-direction:column;justify-content:space-between}
+    .steps{display:grid;gap:9px;margin-top:10px}
+    .step{display:flex;align-items:center;gap:10px;color:#9aa5b5;font-size:12px}
+    .step i{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-style:normal;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);color:#d7dee8;font:700 9px ui-monospace,SFMono-Regular,Menlo,monospace}
+    .stack-strip{position:absolute;left:0;right:0;bottom:0;border-top:1px solid rgba(255,255,255,.07);padding:14px 0;overflow:hidden;white-space:nowrap}
+    .marquee{display:inline-flex;gap:10px;animation:marquee 23s linear infinite;padding-left:10px}
+    .tech{padding:7px 10px;border:1px solid rgba(255,255,255,.085);background:rgba(255,255,255,.03);border-radius:9px;color:#9ea9b9;font:600 10px ui-monospace,SFMono-Regular,Menlo,monospace}
+    @keyframes marquee{to{transform:translateX(-50%)}}
+
+    .project-list{display:grid;gap:18px}
+    .project{
+      min-height:430px;border:1px solid var(--line);border-radius:30px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.025));
+      display:grid;grid-template-columns:.96fr 1.04fr;overflow:hidden;position:relative;transition:.3s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d
+    }
+    .project:hover{border-color:var(--line-strong);box-shadow:0 30px 85px rgba(0,0,0,.30)}
+    .project-copy{padding:34px;display:flex;flex-direction:column;justify-content:space-between;position:relative;z-index:2}
+    .project-meta{display:flex;gap:8px;flex-wrap:wrap}
+    .tag{padding:7px 9px;border:1px solid rgba(255,255,255,.09);border-radius:999px;background:rgba(255,255,255,.03);color:#aeb8c7;font:650 10px ui-monospace,SFMono-Regular,Menlo,monospace}
+    .tag.gold{color:#ffe0a6;border-color:rgba(255,214,138,.20);background:rgba(255,214,138,.055)}
+    .project h3{font-size:clamp(34px,4.4vw,57px);letter-spacing:-.06em;line-height:.98;margin:25px 0 16px}
+    .project p{margin:0;color:#909bac;font-size:14px;line-height:1.75;max-width:530px}
+    .project-metrics{display:flex;flex-wrap:wrap;gap:8px;margin-top:30px}
+    .metric{padding:9px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.075);background:rgba(0,0,0,.19);color:#8995a7;font:600 10px ui-monospace,SFMono-Regular,Menlo,monospace}
+    .metric b{color:#edf3f8}
+    .arrow{position:absolute;left:34px;bottom:28px;width:44px;height:44px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);border-radius:50%;display:grid;place-items:center;transition:.25s}
+    .project:hover .arrow{background:#fff;color:#090d13;transform:translate(3px,-3px)}
+    .project-visual{
+      position:relative;border-left:1px solid rgba(255,255,255,.075);min-height:430px;
+      background:
+        radial-gradient(500px 260px at 60% 28%,rgba(130,215,255,.10),transparent 65%),
+        linear-gradient(180deg,rgba(255,255,255,.017),rgba(0,0,0,.12));
+      display:grid;place-items:center;padding:30px;overflow:hidden
+    }
+    .project:nth-child(2) .project-visual{background:radial-gradient(500px 300px at 58% 35%,rgba(140,245,210,.11),transparent 64%),linear-gradient(180deg,rgba(255,255,255,.017),rgba(0,0,0,.12))}
+    .project:nth-child(3) .project-visual{background:radial-gradient(500px 300px at 58% 35%,rgba(170,151,255,.12),transparent 64%),linear-gradient(180deg,rgba(255,255,255,.017),rgba(0,0,0,.12))}
+    .project:nth-child(4) .project-visual{background:radial-gradient(500px 300px at 58% 35%,rgba(255,214,138,.10),transparent 64%),linear-gradient(180deg,rgba(255,255,255,.017),rgba(0,0,0,.12))}
+    .mock{
+      width:min(100%,560px);aspect-ratio:1.22;border-radius:22px;border:1px solid rgba(255,255,255,.12);background:#0a0e14;
+      box-shadow:0 28px 70px rgba(0,0,0,.38);padding:12px;transform:perspective(900px) rotateY(-7deg) rotateX(2deg) rotateZ(1deg);transition:.4s cubic-bezier(.2,.8,.2,1)
+    }
+    .project:hover .mock{transform:perspective(900px) rotateY(-3deg) rotateX(0) rotateZ(0) translateY(-5px)}
+    .mock-top{height:30px;border-radius:10px;background:#0d131c;border:1px solid rgba(255,255,255,.065);display:flex;align-items:center;padding:0 10px;gap:6px}
+    .mock-top i{width:6px;height:6px;border-radius:50%;background:#3c4654}
+    .mock-body{height:calc(100% - 38px);margin-top:8px;display:grid;grid-template-columns:94px 1fr;gap:8px}
+    .sidebar,.content,.mini{border:1px solid rgba(255,255,255,.065);background:rgba(255,255,255,.027);border-radius:11px}
+    .sidebar{padding:10px;display:grid;align-content:start;gap:8px}
+    .side-line{height:8px;border-radius:4px;background:#202936}.side-line:nth-child(2){width:74%}.side-line:nth-child(3){width:88%}.side-line.active{background:rgba(130,215,255,.5)}
+    .content{padding:10px;display:grid;grid-template-rows:36% 1fr;gap:8px}
+    .hero-pane{border-radius:9px;border:1px solid rgba(255,255,255,.055);background:linear-gradient(120deg,rgba(130,215,255,.12),rgba(140,245,210,.04));display:flex;align-items:end;padding:9px}
+    .hero-pane b{font-size:11px}.hero-pane span{display:block;color:#6f7c8e;font-size:7px;margin-top:3px}
+    .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .mini{padding:8px;display:flex;flex-direction:column;justify-content:space-between}
+    .mini span{font-size:7px;color:#667387}.mini strong{font-size:13px}
+    .radar{width:52px;height:52px;margin:auto;position:relative}
+    .radar svg{width:100%;height:100%}
+    .chat-ui{display:grid;gap:8px}
+    .bubble{padding:8px 9px;border-radius:10px;border:1px solid rgba(255,255,255,.07);font-size:7px;color:#8491a2;background:rgba(255,255,255,.025)}
+    .bubble.me{margin-left:24px;background:rgba(140,245,210,.06);color:#a4cbbd}
+    .lang-row{display:flex;gap:5px;flex-wrap:wrap}.lang-row span{font:700 6px ui-monospace,monospace;padding:4px 5px;border-radius:5px;background:#111823;color:#8490a1}
+    .care-card{height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:8px}
+    .care-orb{width:78px;height:78px;border-radius:50%;margin:auto;background:radial-gradient(circle at 35% 30%,#d8cbff,#8f7ddd 34%,#1a1730 67%);box-shadow:0 0 45px rgba(170,151,255,.22)}
+    .care-bars{display:grid;gap:5px}.care-bars i{height:7px;border-radius:6px;background:#181e29}.care-bars i:nth-child(2){width:82%}.care-bars i:nth-child(3){width:66%}
+    .map{height:100%;border-radius:9px;background:
+      radial-gradient(circle at 26% 54%,rgba(255,214,138,.75) 0 2px,transparent 3px),
+      radial-gradient(circle at 48% 38%,rgba(255,214,138,.70) 0 3px,transparent 4px),
+      radial-gradient(circle at 66% 66%,rgba(255,214,138,.60) 0 2px,transparent 3px),
+      radial-gradient(circle at 78% 28%,rgba(255,214,138,.52) 0 2px,transparent 3px),
+      linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px),
+      #0b1119;background-size:auto,auto,auto,auto,22px 22px,22px 22px,auto;position:relative;overflow:hidden}
+    .map:after{content:"";position:absolute;inset:20% 12%;border:1px dashed rgba(255,214,138,.20);border-radius:50% 43% 55% 48%;transform:rotate(-9deg)}
+    .map-stat{position:absolute;right:8px;bottom:8px;padding:7px 8px;border-radius:8px;background:rgba(7,10,15,.84);border:1px solid rgba(255,255,255,.08);font:700 7px ui-monospace,monospace;color:#d8c18f}
+
+    .career-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:16px}
+    .manifesto,.timeline{border:1px solid var(--line);border-radius:28px;background:var(--panel-2)}
+    .manifesto{padding:31px;display:flex;flex-direction:column;justify-content:space-between;min-height:470px}
+    .manifesto-title{font-size:clamp(36px,4.7vw,60px);letter-spacing:-.06em;line-height:1.02;margin-top:20px}
+    .manifesto p{color:#8f9aab;line-height:1.75;font-size:14px}
+    .timeline{padding:28px}
+    .time-item{display:grid;grid-template-columns:108px 24px 1fr;gap:13px;position:relative;padding:8px 0 29px}
+    .time-item:last-child{padding-bottom:4px}
+    .time-item:not(:last-child):after{content:"";position:absolute;left:119px;top:24px;bottom:-3px;width:1px;background:rgba(255,255,255,.085)}
+    .time-year{font:700 10px ui-monospace,SFMono-Regular,Menlo,monospace;color:#657184;padding-top:2px}
+    .time-dot{width:10px;height:10px;margin-top:1px;border-radius:50%;background:#0c1219;border:2px solid var(--mint);box-shadow:0 0 12px rgba(140,245,210,.22);z-index:2}
+    .time-content strong{display:block;font-size:15px;margin-bottom:6px}
+    .time-content p{margin:0;color:#7f8b9d;font-size:12px;line-height:1.6}
+
+    .cta{padding:90px 0 80px}
+    .cta-box{
+      min-height:430px;border:1px solid var(--line);border-radius:34px;padding:60px 30px;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden;
+      background:
+        radial-gradient(600px 330px at 50% -10%,rgba(140,245,210,.14),transparent 65%),
+        radial-gradient(420px 280px at 70% 100%,rgba(130,215,255,.09),transparent 70%),
+        rgba(255,255,255,.027)
+    }
+    .cta-box:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(circle at 50% 50%,#000,transparent 76%)}
+    .cta-inner{position:relative;z-index:2}
+    .cta h2{max-width:850px;margin:12px auto 18px}
+    .cta p{max-width:630px;margin:0 auto 28px;color:#8f9aab;line-height:1.75;font-size:14px}
+    footer{padding:24px 0 38px;border-top:1px solid rgba(255,255,255,.065);color:#5f6b7d;font:600 10px ui-monospace,SFMono-Regular,Menlo,monospace}
+    .footer-in{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+    .reveal.show{opacity:1;transform:none}
+
+    @media(max-width:980px){
+      .hero-grid{grid-template-columns:1fr;gap:44px}
+      .system-card{min-height:auto}
+      .bento{grid-template-columns:1fr 1fr;grid-auto-rows:200px}
+      .bento-card.big{grid-row:span 1}
+      .bento-card.wide{grid-column:span 2}
+      .project{grid-template-columns:1fr}
+      .project-visual{border-left:0;border-top:1px solid rgba(255,255,255,.075)}
+      .career-grid{grid-template-columns:1fr}
+      .manifesto{min-height:360px}
+    }
+    @media(max-width:680px){
+      .wrap{width:min(100% - 24px,1200px)}
+      .nav{top:10px;width:calc(100% - 20px)}
+      .nav-links a:not(.contact){display:none}
+      .hero{padding:118px 0 52px;min-height:auto}
+      h1{font-size:52px}
+      .hero-copy{font-size:16px}
+      .system-card{border-radius:25px}
+      .pipeline{padding:17px}.console{margin:5px 17px 17px}
+      .section{padding:76px 0}
+      .section-top{display:block}.section-note{margin-top:17px}
+      .bento{grid-template-columns:1fr;grid-auto-rows:auto}
+      .bento-card,.bento-card.big,.bento-card.wide{grid-column:auto;grid-row:auto;min-height:190px}
+      .bento-card.wide{min-height:230px}
+      .project{min-height:0;border-radius:24px}
+      .project-copy{padding:24px 22px 82px}
+      .project h3{font-size:38px}
+      .project-visual{min-height:330px;padding:19px}
+      .mock{transform:none}.project:hover .mock{transform:translateY(-4px)}
+      .arrow{left:22px;bottom:24px}
+      .time-item{grid-template-columns:74px 18px 1fr;gap:11px}
+      .time-item:not(:last-child):after{left:82px}
+      .cta{padding-top:65px}
+      .cta-box{min-height:390px;padding:48px 18px}
+    }
+    @media(prefers-reduced-motion:reduce){
+      *,*:before,*:after{animation:none!important;scroll-behavior:auto!important;transition:none!important}
+      .reveal{opacity:1;transform:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid"></div>
+  <div class="spotlight"></div>
+  <div class="page-noise"></div>
+
+  <nav class="nav">
+    <div class="nav-in">
+      <a href="#top" class="brand"><span class="brand-mark">M</span><span>MOSEJONG</span></a>
+      <div class="nav-links">
+        <a href="#impact">Impact</a>
+        <a href="#projects">Projects</a>
+        <a href="#career">Career</a>
+        <a class="contact" href="mailto:ahtpwhd95@gmail.com">Contact ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="hero-kicker reveal">
+            <span class="pill"><span class="dot"></span> OPEN TO WORK</span>
+            <span>Seoul · AI Service Backend</span>
+          </div>
+          <h1 class="reveal">
+            운영의 감각을<br>
+            <span class="hero-muted">백엔드의 구조로.</span><br>
+            <span class="hero-accent">AI를 서비스로.</span>
+          </h1>
+          <p class="hero-copy reveal">
+            물류·운영 현장에서 <strong>8년 9개월</strong> 동안 재고·납기·구매·출고의 흐름을 다뤘습니다.
+            지금은 <strong>Python · FastAPI</strong>로 API, DB, AI 기능을 연결하고
+            <strong>테스트와 수치로 검증되는 서비스</strong>를 만듭니다.
+          </p>
+          <div class="hero-actions reveal">
+            <a class="btn primary" href="#projects">대표 프로젝트 보기 <span>↓</span></a>
+            <a class="btn ghost" href="https://github.com/mosejong" target="_blank" rel="noreferrer">GitHub ↗</a>
+            <a class="btn ghost" href="https://github.com/mosejong/mosejong/raw/main/assets/%EB%AA%A8%EC%84%B8%EC%A2%85_%EC%9D%B4%EB%A0%A5%EC%84%9C.pdf" target="_blank" rel="noreferrer">Resume PDF ↗</a>
+          </div>
+          <div class="micro reveal">
+            <span>◆ KDT AI Human 4기 우수수료생</span>
+            <span>◆ 최종 프로젝트 대상</span>
+            <span>◆ 1차 프로젝트 최우수상</span>
+          </div>
+        </div>
+
+        <aside class="system-card reveal" aria-label="Backend system visualization">
+          <div class="windowbar">
+            <div class="lights"><i></i><i></i><i></i></div>
+            <span>service_pipeline.py</span>
+          </div>
+          <div class="pipeline">
+            <div class="node">
+              <div class="node-icon">◎</div>
+              <div><strong>Problem Definition</strong><small>field → requirement</small></div>
+              <span class="node-state">READY</span>
+            </div>
+            <div class="flow-line"></div>
+            <div class="node">
+              <div class="node-icon">⌘</div>
+              <div><strong>FastAPI · Database</strong><small>API → PostgreSQL / Redis</small></div>
+              <span class="node-state">200 OK</span>
+            </div>
+            <div class="flow-line"></div>
+            <div class="node">
+              <div class="node-icon">✦</div>
+              <div><strong>AI Integration</strong><small>LLM · RAG · TTS</small></div>
+              <span class="node-state">ONLINE</span>
+            </div>
+            <div class="flow-line"></div>
+            <div class="node">
+              <div class="node-icon">✓</div>
+              <div><strong>Validation · Delivery</strong><small>pytest → CI → Docker</small></div>
+              <span class="node-state">PASSED</span>
+            </div>
+          </div>
+          <div class="console">
+            <div><span class="key">$</span> python -m pytest</div>
+            <div><span class="ok">✓</span> contamination_rate = <span class="num">0.00</span></div>
+            <div><span class="ok">✓</span> evidence_coverage = <span class="num">1.00</span></div>
+            <div><span class="ok">✓</span> embedding_p90 = <span class="num">0.416s</span></div>
+            <div><span class="key">deploy</span>: production ready <span class="cursor"></span></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="impact">
+      <div class="wrap">
+        <div class="section-top reveal">
+          <div>
+            <div class="section-kicker">01 / IMPACT</div>
+            <h2>설명보다<br>숫자로 증명합니다.</h2>
+          </div>
+          <p class="section-note">기술을 사용했다는 말보다 무엇이 개선됐고, 어떤 기준으로 검증했는지 보여주는 포트폴리오를 지향합니다.</p>
+        </div>
+
+        <div class="bento">
+          <div class="bento-card big reveal">
+            <div class="bento-label">Job contamination rate</div>
+            <div class="impact">12.5% → <span class="accent" data-count="0">0%</span></div>
+            <div class="bento-copy">직무 추천 데이터 오염을 추적해 0%까지 개선.</div>
+            <div class="chart"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+          </div>
+
+          <div class="bento-card award-card reveal">
+            <div><div class="bento-label">Recognition</div><div class="award-title">KDT 최종<br>프로젝트 대상</div></div>
+            <div class="trophy">🏆</div>
+          </div>
+
+          <div class="bento-card award-card reveal">
+            <div><div class="bento-label">SchoolBridge</div><div class="award-title">번역 품질<br>39.0 → 89.6</div></div>
+            <div class="pill" style="width:max-content">8 languages</div>
+          </div>
+
+          <div class="bento-card workstyle reveal">
+            <div>
+              <div class="bento-label">How I work</div>
+              <div class="steps">
+                <div class="step"><i>01</i> 문제를 데이터 흐름으로 정리</div>
+                <div class="step"><i>02</i> API · DB · AI 기능 연결</div>
+                <div class="step"><i>03</i> 테스트 · 로그 · 수치로 검증</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bento-card wide reveal" style="min-height:210px">
+            <div class="bento-label">Backend toolbox</div>
+            <div class="impact" style="font-size:43px;margin-top:16px">Build · Measure · Improve</div>
+            <div class="bento-copy">Python / FastAPI를 중심으로 PostgreSQL, Redis, AI API, Docker, CI까지 연결합니다.</div>
+            <div class="stack-strip">
+              <div class="marquee">
+                <span class="tech">Python</span><span class="tech">FastAPI</span><span class="tech">PostgreSQL</span><span class="tech">pgvector</span><span class="tech">Redis</span><span class="tech">SQLAlchemy</span><span class="tech">OpenAI</span><span class="tech">Gemini</span><span class="tech">RAG</span><span class="tech">Docker</span><span class="tech">Nginx</span><span class="tech">pytest</span><span class="tech">GitHub Actions</span>
+                <span class="tech">Python</span><span class="tech">FastAPI</span><span class="tech">PostgreSQL</span><span class="tech">pgvector</span><span class="tech">Redis</span><span class="tech">SQLAlchemy</span><span class="tech">OpenAI</span><span class="tech">Gemini</span><span class="tech">RAG</span><span class="tech">Docker</span><span class="tech">Nginx</span><span class="tech">pytest</span><span class="tech">GitHub Actions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="projects">
+      <div class="wrap">
+        <div class="section-top reveal">
+          <div>
+            <div class="section-kicker">02 / SELECTED WORK</div>
+            <h2>프로젝트는<br>케이스 스터디처럼.</h2>
+          </div>
+          <p class="section-note">각 프로젝트에서 내가 맡은 문제, 구현 범위, 결과가 한 화면 안에서 보이도록 구성했습니다.</p>
+        </div>
+
+        <div class="project-list">
+          <a class="project reveal tilt" href="https://github.com/neunglog-sys/job_simulator" target="_blank" rel="noreferrer">
+            <div class="project-copy">
+              <div>
+                <div class="project-meta"><span class="tag gold">🏆 GRAND PRIZE</span><span class="tag">REPORTING · DATA PIPELINE</span></div>
+                <h3>Jobiverse</h3>
+                <p>AI 상담 → 가상 직무 체험 → 근거 기반 적합도 리포트로 이어지는 진로 탐색 플랫폼. 리포트, 개인화 추천 근거, 공공 API, 데이터 검증과 CI를 담당했습니다.</p>
+                <div class="project-metrics">
+                  <span class="metric">contamination <b>12.5% → 0%</b></span>
+                  <span class="metric">embedding p90 <b>1.3s → 0.4s</b></span>
+                  <span class="metric">evidence <b>100%</b></span>
+                  <span class="metric">project tests <b>564</b></span>
+                </div>
+              </div>
+              <span class="arrow">↗</span>
+            </div>
+            <div class="project-visual">
+              <div class="mock">
+                <div class="mock-top"><i></i><i></i><i></i></div>
+                <div class="mock-body">
+                  <div class="sidebar">
+                    <div class="side-line active"></div><div class="side-line"></div><div class="side-line"></div><div class="side-line"></div>
+                  </div>
+                  <div class="content">
+                    <div class="hero-pane"><div><b>Career Fit Report</b><span>Evidence-based recommendation</span></div></div>
+                    <div class="mini-grid">
+                      <div class="mini">
+                        <span>COMPETENCY RADAR</span>
+                        <div class="radar">
+                          <svg viewBox="0 0 100 100" aria-hidden="true">
+                            <polygon points="50,5 91,32 80,82 20,82 9,32" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="2"/>
+                            <polygon points="50,18 78,38 70,70 28,78 17,37" fill="rgba(130,215,255,.18)" stroke="#82d7ff" stroke-width="2"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="mini"><span>MATCH SCORE</span><strong style="font-size:26px;color:#8cf5d2">92</strong><span>Top 3 job family</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <a class="project reveal tilt" href="https://github.com/Maxmunzy/multicultural-ai" target="_blank" rel="noreferrer">
+            <div class="project-copy">
+              <div>
+                <div class="project-meta"><span class="tag gold">🏆 BEST PROJECT</span><span class="tag">TRANSLATION · TTS</span></div>
+                <h3>SchoolBridge</h3>
+                <p>가정통신문의 날짜·금액·준비물 같은 핵심정보를 보존하면서 8개 언어로 번역하고 음성으로 전달하는 AI 서비스.</p>
+                <div class="project-metrics">
+                  <span class="metric">quality <b>39.0 → 89.6</b></span>
+                  <span class="metric"><b>8 languages</b></span>
+                  <span class="metric"><b>Android E2E</b></span>
+                </div>
+              </div>
+              <span class="arrow">↗</span>
+            </div>
+            <div class="project-visual">
+              <div class="mock">
+                <div class="mock-top"><i></i><i></i><i></i></div>
+                <div class="mock-body">
+                  <div class="sidebar">
+                    <div class="side-line active"></div><div class="side-line"></div><div class="side-line"></div>
+                  </div>
+                  <div class="content">
+                    <div class="hero-pane" style="background:linear-gradient(120deg,rgba(140,245,210,.13),rgba(130,215,255,.035))">
+                      <div><b>School Notice AI</b><span>Translate · Preserve · Speak</span></div>
+                    </div>
+                    <div class="mini-grid">
+                      <div class="mini chat-ui">
+                        <div class="bubble">준비물: 실내화 · 색연필</div>
+                        <div class="bubble me">Đồ dùng: dép đi trong nhà...</div>
+                        <div class="lang-row"><span>VI</span><span>EN</span><span>ZH</span><span>TH</span><span>+4</span></div>
+                      </div>
+                      <div class="mini"><span>QUALITY SCORE</span><strong style="font-size:23px;color:#8cf5d2">89.6</strong><span>with glossary</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <a class="project reveal tilt" href="https://github.com/mosejong/Rainbow-Bridge" target="_blank" rel="noreferrer">
+            <div class="project-copy">
+              <div>
+                <div class="project-meta"><span class="tag">TEAM LEAD</span><span class="tag">BACKEND INTEGRATION</span></div>
+                <h3>Rainbow Bridge</h3>
+                <p>AI 펫로스 애프터케어 서비스. 팀 운영, API 통합, 서버 배포, 안전성 평가와 모바일 시연까지 사용자 흐름을 하나로 연결했습니다.</p>
+                <div class="project-metrics">
+                  <span class="metric">safety <b>289 cases</b></span>
+                  <span class="metric">miss <b>0</b></span>
+                  <span class="metric"><b>NCP · Docker · nginx</b></span>
+                </div>
+              </div>
+              <span class="arrow">↗</span>
+            </div>
+            <div class="project-visual">
+              <div class="mock">
+                <div class="mock-top"><i></i><i></i><i></i></div>
+                <div class="mock-body">
+                  <div class="sidebar"><div class="side-line active"></div><div class="side-line"></div><div class="side-line"></div></div>
+                  <div class="content">
+                    <div class="hero-pane" style="background:linear-gradient(120deg,rgba(170,151,255,.14),rgba(255,156,176,.035))">
+                      <div><b>Emotional Care Flow</b><span>check-in → message → mission</span></div>
+                    </div>
+                    <div class="mini-grid">
+                      <div class="mini care-card"><span>AI COMPANION</span><div class="care-orb"></div><div class="care-bars"><i></i><i></i><i></i></div></div>
+                      <div class="mini"><span>SAFETY ROUTING</span><strong style="font-size:23px;color:#c9bbff">289</strong><span>golden cases / miss 0</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <a class="project reveal tilt" href="https://github.com/mosejong/procurement-logistics-ai" target="_blank" rel="noreferrer">
+            <div class="project-copy">
+              <div>
+                <div class="project-meta"><span class="tag">SOLO PRODUCT</span><span class="tag">PUBLIC DATA · ML</span></div>
+                <h3>Procurement<br>Logistics AI</h3>
+                <p>8년 9개월의 물류 경험을 공공데이터 제품으로 연결한 개인 프로젝트. 수집·정제·분류·지표 설계·AI 해석·지도 대시보드까지 직접 구현했습니다.</p>
+                <div class="project-metrics">
+                  <span class="metric"><b>6 agencies · 9 sources</b></span>
+                  <span class="metric">aT data <b>734K+</b></span>
+                  <span class="metric"><b>final-round review</b></span>
+                </div>
+              </div>
+              <span class="arrow">↗</span>
+            </div>
+            <div class="project-visual">
+              <div class="mock">
+                <div class="mock-top"><i></i><i></i><i></i></div>
+                <div class="mock-body">
+                  <div class="sidebar"><div class="side-line active" style="background:rgba(255,214,138,.52)"></div><div class="side-line"></div><div class="side-line"></div></div>
+                  <div class="content">
+                    <div class="hero-pane" style="background:linear-gradient(120deg,rgba(255,214,138,.12),rgba(130,215,255,.025))">
+                      <div><b>Regional Demand Map</b><span>public procurement opportunity</span></div>
+                    </div>
+                    <div class="mini-grid">
+                      <div class="mini" style="padding:5px"><div class="map"><div class="map-stat">734K+ records</div></div></div>
+                      <div class="mini"><span>OPPORTUNITY SCORE</span><strong style="font-size:23px;color:#ffd68a">86.4</strong><span>demand · competition · logistics</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="career">
+      <div class="wrap">
+        <div class="section-top reveal">
+          <div>
+            <div class="section-kicker">03 / CAREER</div>
+            <h2>경력은 바뀌었지만<br>문제 푸는 방식은 같습니다.</h2>
+          </div>
+        </div>
+
+        <div class="career-grid">
+          <div class="manifesto reveal">
+            <div>
+              <span class="pill">FROM FIELD TO BACKEND</span>
+              <div class="manifesto-title">현장의 병목을 보던 사람이,<br><span class="hero-accent">서비스의 병목</span>을 봅니다.</div>
+            </div>
+            <p>재고·납기·구매·출고를 운영하며 배운 우선순위와 검수 감각을 소프트웨어에 가져왔습니다. “왜 느리지?”, “어디서 잘못됐지?”, “근거가 있나?”를 끝까지 확인하는 개발자가 되려 합니다.</p>
+          </div>
+
+          <div class="timeline reveal">
+            <div class="time-item">
+              <div class="time-year">2013—2026</div><div class="time-dot"></div>
+              <div class="time-content"><strong>자동차 부품 물류 · 운영</strong><p>입출고, 재고, 납기, 구매, 거래처 대응. 실무에서 병목과 우선순위를 판단.</p></div>
+            </div>
+            <div class="time-item">
+              <div class="time-year">2026.04—05</div><div class="time-dot"></div>
+              <div class="time-content"><strong>SchoolBridge · 최우수상</strong><p>8개 언어 번역 · TTS 파이프라인, 핵심정보 보존, Android E2E.</p></div>
+            </div>
+            <div class="time-item">
+              <div class="time-year">2026.06</div><div class="time-dot"></div>
+              <div class="time-content"><strong>Rainbow Bridge · Team Lead</strong><p>서비스 흐름, API 통합, 배포, 안전성 평가, 팀 개발 운영.</p></div>
+            </div>
+            <div class="time-item">
+              <div class="time-year">2026.06—07</div><div class="time-dot"></div>
+              <div class="time-content"><strong>Jobiverse · 대상</strong><p>Reporting · Data Pipeline, 추천 근거, 공공 API, 성능 개선과 CI.</p></div>
+            </div>
+            <div class="time-item">
+              <div class="time-year">NOW</div><div class="time-dot"></div>
+              <div class="time-content"><strong>Python · FastAPI AI Backend</strong><p>AI 기능을 API · DB · 서비스 흐름에 연결하고 검증 가능한 결과를 만드는 개발자로 전환.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="wrap">
+        <div class="cta-box reveal">
+          <div class="cta-inner">
+            <div class="section-kicker">LET'S BUILD SOMETHING USEFUL</div>
+            <h2>“되는 기능”에서 끝나지 않고<br><span class="hero-accent">쓸 수 있는 서비스</span>를 만들겠습니다.</h2>
+            <p>AI를 붙이는 것보다, 그것이 사용자의 실제 흐름 안에서 안정적으로 동작하도록 만드는 백엔드 개발을 하고 싶습니다.</p>
+            <div class="hero-actions" style="justify-content:center">
+              <a class="btn primary" href="mailto:ahtpwhd95@gmail.com">이메일 보내기 ↗</a>
+              <a class="btn ghost" href="https://github.com/mosejong" target="_blank" rel="noreferrer">GitHub ↗</a>
+              <a class="btn ghost" href="https://github.com/mosejong/mosejong/raw/main/assets/%EB%AA%A8%EC%84%B8%EC%A2%85_%EC%9D%B4%EB%A0%A5%EC%84%9C.pdf" target="_blank" rel="noreferrer">Resume ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-in">
+      <span>© 2026 MOSEJONG</span>
+      <span>PYTHON · FASTAPI · AI BACKEND · SEOUL</span>
+    </div>
+  </footer>
+
+  <script>
+    // mouse-reactive ambient light
+    window.addEventListener('pointermove', (e)=>{
+      document.documentElement.style.setProperty('--mx', e.clientX + 'px');
+      document.documentElement.style.setProperty('--my', e.clientY + 'px');
+    }, {passive:true});
+
+    // reveal
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach((e)=>{
+        if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target); }
+      });
+    }, {threshold:.10});
+    document.querySelectorAll('.reveal').forEach((el,i)=>{
+      el.style.transitionDelay = `${Math.min(i % 5,4) * 55}ms`;
+      io.observe(el);
+    });
+
+    // subtle 3D tilt for project cards
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(!reduced && window.matchMedia('(pointer:fine)').matches){
+      document.querySelectorAll('.tilt').forEach(card=>{
+        card.addEventListener('pointermove', e=>{
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX-r.left)/r.width - .5;
+          const y = (e.clientY-r.top)/r.height - .5;
+          card.style.transform = `perspective(1400px) rotateX(${(-y*1.5).toFixed(2)}deg) rotateY(${(x*1.8).toFixed(2)}deg) translateY(-2px)`;
+        });
+        card.addEventListener('pointerleave', ()=>card.style.transform='');
+      });
+    }
+  </script>
+</body>
+</html>
