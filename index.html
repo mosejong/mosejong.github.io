@@ -319,6 +319,91 @@
       *,*:before,*:after{animation:none!important;scroll-behavior:auto!important;transition:none!important}
       .reveal{opacity:1;transform:none}
     }
+
+    /* Awards side dock */
+    .awards-dock{
+      position:fixed;right:14px;top:50%;z-index:75;width:390px;
+      transform:translate(342px,-50%);
+      transition:transform .38s cubic-bezier(.2,.8,.2,1);
+      filter:drop-shadow(0 24px 70px rgba(0,0,0,.34));
+    }
+    .awards-dock:hover,.awards-dock:focus-within,.awards-dock.open{transform:translate(0,-50%)}
+    .awards-tab{
+      position:absolute;left:-48px;top:50%;transform:translateY(-50%);
+      width:48px;height:142px;border:1px solid rgba(255,255,255,.13);border-right:0;
+      border-radius:17px 0 0 17px;background:rgba(10,14,20,.88);backdrop-filter:blur(18px);
+      color:#dce4ed;display:flex;align-items:center;justify-content:center;cursor:pointer;
+      box-shadow:-12px 14px 42px rgba(0,0,0,.22)
+    }
+    .awards-tab span{
+      writing-mode:vertical-rl;transform:rotate(180deg);
+      font:800 10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em
+    }
+    .awards-tab i{
+      position:absolute;top:13px;width:7px;height:7px;border-radius:50%;background:var(--amber);
+      box-shadow:0 0 18px rgba(255,214,138,.75)
+    }
+    .awards-panel{
+      border:1px solid rgba(255,255,255,.12);border-radius:24px;background:rgba(9,13,19,.92);
+      backdrop-filter:blur(24px) saturate(1.18);padding:17px;overflow:hidden
+    }
+    .awards-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:3px 3px 14px}
+    .awards-head small{display:block;color:#788496;font:700 9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;margin-bottom:6px}
+    .awards-head strong{font-size:19px;letter-spacing:-.04em}
+    .awards-count{padding:6px 8px;border:1px solid rgba(255,255,255,.08);border-radius:999px;color:#8996a7;font:700 9px ui-monospace,monospace}
+    .award-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .award-item{
+      appearance:none;padding:0;text-align:left;color:inherit;font:inherit;cursor:pointer;
+      border:1px solid rgba(255,255,255,.085);border-radius:15px;background:rgba(255,255,255,.026);
+      overflow:hidden;transition:.23s cubic-bezier(.2,.8,.2,1)
+    }
+    .award-item:hover{transform:translateY(-3px);border-color:rgba(255,214,138,.24);background:rgba(255,255,255,.045)}
+    .award-thumb{aspect-ratio:1.415/1;overflow:hidden;background:#eef0f2;position:relative}
+    .award-thumb img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;transition:transform .28s ease}
+    .award-item:hover .award-thumb img{transform:scale(1.035)}
+    .award-thumb:after{
+      content:"VIEW";position:absolute;right:7px;bottom:7px;padding:4px 6px;border-radius:6px;
+      background:rgba(7,10,15,.76);color:#dfe6ee;font:800 7px ui-monospace,monospace;
+      letter-spacing:.08em;opacity:0;transition:.2s
+    }
+    .award-item:hover .award-thumb:after{opacity:1}
+    .award-info{padding:10px 10px 11px}
+    .award-info b{display:block;font-size:11px;line-height:1.35;margin-bottom:4px}
+    .award-info span{display:block;color:#667386;font:650 8px ui-monospace,monospace;line-height:1.4}
+    .awards-foot{padding:12px 3px 1px;color:#647184;font-size:9px;line-height:1.55}
+    .award-modal{
+      position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:28px;
+      background:rgba(3,6,10,.84);backdrop-filter:blur(14px)
+    }
+    .award-modal.open{display:flex}
+    .award-modal-card{
+      width:min(760px,96vw);max-height:92vh;position:relative;border:1px solid rgba(255,255,255,.14);
+      border-radius:24px;background:#0b0f15;box-shadow:0 35px 120px rgba(0,0,0,.58);padding:13px
+    }
+    .award-modal-card img{display:block;width:100%;max-height:calc(92vh - 26px);object-fit:contain;border-radius:14px;background:#fff}
+    .award-modal-close{
+      position:absolute;right:-13px;top:-13px;width:38px;height:38px;border:1px solid rgba(255,255,255,.15);
+      border-radius:50%;background:#10161f;color:#fff;display:grid;place-items:center;font-size:18px;cursor:pointer;
+      box-shadow:0 12px 30px rgba(0,0,0,.38)
+    }
+    @media(max-width:680px){
+      .awards-dock{
+        right:12px;top:auto;bottom:14px;width:min(360px,calc(100vw - 24px));
+        transform:translateY(calc(100% - 49px))
+      }
+      .awards-dock:hover{transform:translateY(calc(100% - 49px))}
+      .awards-dock.open{transform:translateY(0)}
+      .awards-tab{
+        left:auto;right:0;top:-49px;transform:none;width:114px;height:42px;
+        border:1px solid rgba(255,255,255,.13);border-bottom:0;border-radius:14px 14px 0 0
+      }
+      .awards-tab span{writing-mode:horizontal-tb;transform:none;letter-spacing:.10em}
+      .awards-tab i{left:10px;top:50%;transform:translateY(-50%)}
+      .awards-panel{border-radius:20px}
+      .award-modal{padding:13px}
+      .award-modal-close{right:5px;top:5px}
+    }
+
   </style>
 </head>
 <body>
@@ -337,6 +422,45 @@
       </div>
     </div>
   </nav>
+
+
+  <aside class="awards-dock" id="awardsDock" aria-label="Awards and certificates">
+    <button class="awards-tab" id="awardsTab" type="button" aria-expanded="false" aria-controls="awardsPanel">
+      <i></i><span>AWARDS</span>
+    </button>
+    <div class="awards-panel" id="awardsPanel">
+      <div class="awards-head">
+        <div><small>PROOF / 2026</small><strong>Awards & Certificates</strong></div>
+        <span class="awards-count">4 RECORDS</span>
+      </div>
+      <div class="award-grid">
+        <button class="award-item" type="button" data-award-src="assets/awards/grand-prize.webp" data-award-name="AI휴먼 과정 프로젝트 대상">
+          <div class="award-thumb"><img src="assets/awards/grand-prize.webp" alt="AI휴먼 과정 프로젝트 대상 상장"></div>
+          <div class="award-info"><b>프로젝트 대상 · 1팀</b><span>2026.08.03 · ESTAI-4-2026-007</span></div>
+        </button>
+        <button class="award-item" type="button" data-award-src="assets/awards/excellent-trainee.webp" data-award-name="AI휴먼 과정 우수수료생 대상">
+          <div class="award-thumb"><img src="assets/awards/excellent-trainee.webp" alt="AI휴먼 과정 우수수료생 대상 상장"></div>
+          <div class="award-info"><b>우수수료생 대상</b><span>2026.08.03 · ESTAI-4-2026-010</span></div>
+        </button>
+        <button class="award-item" type="button" data-award-src="assets/awards/best-project.webp" data-award-name="AI휴먼 과정 프로젝트 최우수상">
+          <div class="award-thumb"><img src="assets/awards/best-project.webp" alt="AI휴먼 과정 프로젝트 최우수상 상장"></div>
+          <div class="award-info"><b>프로젝트 최우수상 · 5팀</b><span>2026.05.13 · ESTAI-4-2026-001</span></div>
+        </button>
+        <button class="award-item" type="button" data-award-src="assets/awards/completion-redacted.webp" data-award-name="K-Digital Training 수료증">
+          <div class="award-thumb"><img src="assets/awards/completion-redacted.webp" alt="K-Digital Training AI휴먼 과정 수료증"></div>
+          <div class="award-info"><b>K-Digital Training 수료증</b><span>2026.08.04 · AI Human/4-2026-010</span></div>
+        </button>
+      </div>
+      <div class="awards-foot">Desktop: hover to open · Mobile: tap AWARDS · Click a certificate to enlarge.</div>
+    </div>
+  </aside>
+
+  <div class="award-modal" id="awardModal" role="dialog" aria-modal="true" aria-label="Certificate preview">
+    <div class="award-modal-card">
+      <button class="award-modal-close" id="awardModalClose" type="button" aria-label="Close">×</button>
+      <img id="awardModalImage" alt="Award certificate enlarged preview">
+    </div>
+  </div>
 
   <main id="top">
     <section class="hero">
@@ -724,6 +848,37 @@
         card.addEventListener('pointerleave', ()=>card.style.transform='');
       });
     }
+
+    // awards side dock + certificate modal
+    const awardsDock = document.getElementById('awardsDock');
+    const awardsTab = document.getElementById('awardsTab');
+    const awardModal = document.getElementById('awardModal');
+    const awardModalImage = document.getElementById('awardModalImage');
+    const awardModalClose = document.getElementById('awardModalClose');
+
+    awardsTab?.addEventListener('click', ()=>{
+      const open = awardsDock.classList.toggle('open');
+      awardsTab.setAttribute('aria-expanded', String(open));
+    });
+
+    document.querySelectorAll('.award-item').forEach((item)=>{
+      item.addEventListener('click', ()=>{
+        awardModalImage.src = item.dataset.awardSrc;
+        awardModalImage.alt = (item.dataset.awardName || 'Award certificate') + ' enlarged preview';
+        awardModal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    function closeAwardModal(){
+      awardModal.classList.remove('open');
+      awardModalImage.removeAttribute('src');
+      document.body.style.overflow = '';
+    }
+    awardModalClose?.addEventListener('click', closeAwardModal);
+    awardModal?.addEventListener('click', (e)=>{ if(e.target === awardModal) closeAwardModal(); });
+    window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeAwardModal(); });
+
   </script>
 </body>
 </html>
