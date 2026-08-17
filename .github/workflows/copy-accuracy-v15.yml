@@ -17,21 +17,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Apply copy accuracy patch
-        run: python .github/scripts/copy_accuracy_v15.py
+      - name: Apply final SchoolBridge wording patch
+        run: python .github/scripts/copy_accuracy_v15b.py
 
       - name: Validate
         run: |
           git diff --check
-          grep -q "demo ready" index.html
-          grep -q "누적 8년 9개월" index.html
-          grep -q "team safety routing" projects/rainbow-bridge.html
-          grep -q "classification accuracy" projects/procurement-logistics-ai.html
+          grep -q "project backend tests" projects/schoolbridge.html
+          grep -q "학교 공지 사용 맥락" projects/schoolbridge.html
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html projects
-          git commit -m "copy: tighten accuracy and ownership wording"
+          git add projects/schoolbridge.html
+          git commit -m "copy: clarify SchoolBridge validation wording"
           git push
