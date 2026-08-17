@@ -3,3 +3,10 @@
 .result{display:flex;flex-direction:column}
 .result span{order:-1;margin:0 0 11px;color:#7f8da0;font:800 10px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.045em}
 .result strong{order:0}
+
+/* v1.6b — Korean case-study heading fit */
+.section h2{word-break:keep-all}
+@media(min-width:901px){
+  .section-head{grid-template-columns:1fr 1fr}
+  .section h2{font-size:clamp(38px,4.6vw,60px);line-height:1.03}
+}
