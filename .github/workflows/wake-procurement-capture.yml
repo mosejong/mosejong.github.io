@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  wake-and-capture:
+  capture:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout portfolio
@@ -21,12 +21,12 @@ jobs:
       - name: Install Selenium
         run: python -m pip install --quiet selenium
 
-      - name: Wake Streamlit and capture real homepage
+      - name: Capture live procurement dashboard
         env:
           APP_URL: https://procurement-logistics-ai-5qian47widxpcuqefpjipy.streamlit.app
         run: |
           mkdir -p assets/projects
-          cat > /tmp/capture_procurement.py <<'PY'
+          cat > /tmp/capture.py <<'PY'
           import os, time
           from pathlib import Path
           from selenium import webdriver
@@ -35,111 +35,51 @@ jobs:
 
           url = os.environ['APP_URL']
           out = Path(os.environ['GITHUB_WORKSPACE']) / 'assets/projects/procurement-home.png'
-
           opts = Options()
           opts.add_argument('--headless=new')
           opts.add_argument('--no-sandbox')
           opts.add_argument('--disable-dev-shm-usage')
           opts.add_argument('--disable-gpu')
-          opts.add_argument('--window-size=1440,900')
+          opts.add_argument('--window-size=1440,1100')
           opts.add_argument('--hide-scrollbars')
-
-          def body_text(driver):
-              try:
-                  return driver.find_element(By.TAG_NAME, 'body').text
-              except Exception:
-                  return ''
-
-          def is_sleep_page(text):
-              t = text.lower()
-              return 'zzzz' in t or 'gone to sleep' in t or 'get this app back up' in t
-
-          def is_live_streamlit(driver, text):
-              source = driver.page_source
-              return (not is_sleep_page(text) and len(text.strip()) > 80 and
-                      ('data-testid="stApp"' in source or 'stApp' in source or 'streamlit' in source.lower()))
 
           driver = webdriver.Chrome(options=opts)
           try:
-              driver.get(url)
-              time.sleep(5)
-              text = body_text(driver)
-
-              if is_sleep_page(text):
-                  clicked = False
-                  for xpath in [
-                      "//button[contains(., 'get this app back up')]",
-                      "//a[contains(., 'get this app back up')]",
-                      "//*[contains(normalize-space(.), 'Yes, get this app back up!')]",
-                  ]:
-                      try:
-                          for el in driver.find_elements(By.XPATH, xpath):
-                              if el.is_displayed():
-                                  driver.execute_script("arguments[0].click();", el)
-                                  clicked = True
-                                  print('Wake-up control clicked')
-                                  break
-                      except Exception:
-                          pass
-                      if clicked:
-                          break
-
-              # Community Cloud can keep the sleep page visible after the wake request.
-              # Refresh periodically and accept only a real Streamlit app screen.
-              deadline = time.time() + 240
-              attempt = 0
+              ok = False
               last = ''
-              while time.time() < deadline:
-                  attempt += 1
-                  time.sleep(10)
+              for i in range(12):
                   driver.get(url)
-                  time.sleep(5)
-                  text = body_text(driver)
-                  last = text[:1000]
-                  print(f'poll {attempt}: {last[:120]!r}')
-
-                  if is_live_streamlit(driver, text):
-                      print('Live Streamlit app detected')
+                  time.sleep(8)
+                  try:
+                      last = driver.find_element(By.TAG_NAME, 'body').text
+                  except Exception:
+                      last = ''
+                  low = last.lower()
+                  print(f'attempt {i+1}: {last[:160]!r}')
+                  if 'zzzz' not in low and 'gone to sleep' not in low and 'get this app back up' not in low and len(last.strip()) > 40:
+                      ok = True
                       break
-
-                  if is_sleep_page(text):
-                      # Re-issue wake request if the Community Cloud page still presents it.
-                      try:
-                          controls = driver.find_elements(By.XPATH, "//*[contains(normalize-space(.), 'get this app back up')]")
-                          for el in controls:
-                              if el.is_displayed():
-                                  driver.execute_script("arguments[0].click();", el)
-                                  print('Wake-up control clicked again')
-                                  break
-                      except Exception:
-                          pass
-              else:
-                  raise RuntimeError('App did not wake in time. Last page text: ' + last)
-
+                  time.sleep(4)
+              if not ok:
+                  raise RuntimeError('Live app not detected: ' + last[:500])
               time.sleep(12)
-              driver.get(url)
-              time.sleep(8)
-              text = body_text(driver)
-              if not is_live_streamlit(driver, text):
-                  raise RuntimeError('Refusing to save non-live Streamlit screen: ' + text[:500])
-
               driver.execute_script('window.scrollTo(0,0)')
               time.sleep(2)
               driver.save_screenshot(str(out))
-              print('Saved live app capture:', out, out.stat().st_size)
+              print('Saved:', out, out.stat().st_size)
           finally:
               driver.quit()
           PY
-          python /tmp/capture_procurement.py
+          python /tmp/capture.py
 
-      - name: Commit real homepage capture
+      - name: Commit screenshot
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/projects/procurement-home.png
           if git diff --cached --quiet; then
-            echo "No screenshot change"
+            echo "Screenshot unchanged"
             exit 0
           fi
-          git commit -m "fix: replace sleeping Streamlit capture with live dashboard"
+          git commit -m "fix: use live procurement dashboard capture"
           git push
