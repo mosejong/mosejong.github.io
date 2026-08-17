@@ -5,6 +5,18 @@
 - Portfolio: https://mosejong.github.io
 - GitHub: https://github.com/mosejong
 
+## Portfolio v1.2
+
+- 프로젝트 데모 GIF 3종을 로컬 MP4 + WebP poster로 전환
+- 화면 근처에 들어온 데모 영상만 재생하고 화면 밖에서는 자동 pause
+- `prefers-reduced-motion` 사용자는 자동 재생하지 않도록 처리
+- SchoolBridge / Procurement 프로젝트 캡처 PNG를 WebP로 전환
+- 대표 미디어 6종 합산 6.26 MiB → 731.8 KiB, 약 88.6% 감소
+- 숨겨진 Awards 이미지와 하단 Case Study 이미지에 lazy loading / async decoding 적용
+- Case Study 첫 화면 이미지는 fetch priority를 높이고 하단 이미지는 지연 로딩
+- 키보드 사용자를 위한 `:focus-visible` 포커스 표시 추가
+- 외부 raw GitHub 미디어 의존 제거 및 사이트 내부 자산으로 통일
+
 ## Portfolio v1.1
 
 - 대표 프로젝트 4개 Case Study 페이지 제공
