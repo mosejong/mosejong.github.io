@@ -1,0 +1,19 @@
+name: Export Procurement Capture
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/export-procurement-capture.yml"
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Upload capture
+        uses: actions/upload-artifact@v4
+        with:
+          name: procurement-live-capture
+          path: assets/projects/procurement-home.png
+          if-no-files-found: error
