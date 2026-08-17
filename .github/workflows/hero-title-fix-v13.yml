@@ -1,0 +1,35 @@
+name: Hero Title Fix v1.3
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/hero-title-fix-v13.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Fix hero title clipping
+        run: python .github/scripts/fix_hero_title.py
+
+      - name: Validate
+        run: |
+          git diff --check
+          grep -q 'HERO_TITLE_CLIP_FIX_V13' index.html
+          grep -q 'white-space:nowrap' index.html
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "fix: prevent hero title clipping and wrapping"
+          git push
