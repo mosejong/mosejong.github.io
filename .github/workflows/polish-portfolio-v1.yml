@@ -1,0 +1,116 @@
+name: Polish Portfolio v1
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/polish-portfolio-v1.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Apply portfolio polish
+        run: python .github/scripts/polish_portfolio_v1.py
+
+      - name: Validate expected content
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8')
+          checks=[
+            'school-flow-pill',
+            'rainbow-stage',
+            'origin-note',
+            'dashboard-badges',
+            'assets/projects/procurement-home.png',
+            'assets/projects/schoolbridge-parent.png',
+            'assets/projects/schoolbridge-teacher.png',
+            'final_report.gif',
+            'rainbow-bridge-demo.gif',
+          ]
+          for x in checks:
+              assert x in s, x
+          for p in [
+            'assets/projects/procurement-home.png',
+            'assets/projects/schoolbridge-parent.png',
+            'assets/projects/schoolbridge-teacher.png',
+            'assets/awards/grand-prize.webp',
+          ]:
+              assert Path(p).exists(), p
+          print('HTML/assets validation OK')
+          PY
+
+      - name: Install Korean font and browser helpers
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk >/dev/null
+          fc-cache -f >/dev/null
+          python -m pip install --quiet selenium
+
+      - name: Capture project section QA
+        run: |
+          python -m http.server 8000 >/tmp/portfolio-server.log 2>&1 &
+          sleep 2
+          mkdir -p qa-captures
+          cat > /tmp/qa.py <<'PY'
+          import time
+          from pathlib import Path
+          from selenium import webdriver
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.chrome.options import Options
+
+          def make_driver(w,h):
+              o=Options()
+              o.add_argument('--headless=new')
+              o.add_argument('--no-sandbox')
+              o.add_argument('--disable-dev-shm-usage')
+              o.add_argument(f'--window-size={w},{h}')
+              return webdriver.Chrome(options=o)
+
+          def capture_project(name,index,w=1440,h=900):
+              d=make_driver(w,h)
+              try:
+                  d.get('http://127.0.0.1:8000')
+                  time.sleep(4)
+                  cards=d.find_elements(By.CSS_SELECTOR,'.project-list .project')
+                  assert len(cards) >= 4, len(cards)
+                  d.execute_script("arguments[0].scrollIntoView({block:'center'});",cards[index])
+                  time.sleep(3)
+                  d.save_screenshot(f'qa-captures/{name}.png')
+              finally:
+                  d.quit()
+
+          capture_project('jobiverse-desktop',0)
+          capture_project('schoolbridge-desktop',1)
+          capture_project('rainbow-desktop',2)
+          capture_project('procurement-desktop',3)
+          capture_project('schoolbridge-mobile',1,430,900)
+          capture_project('procurement-mobile',3,430,900)
+          PY
+          python /tmp/qa.py
+
+      - name: Upload QA captures
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-v1-qa
+          path: qa-captures/*.png
+
+      - name: Commit polished portfolio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No portfolio changes"
+            exit 0
+          fi
+          git commit -m "feat: polish portfolio project showcase v1"
+          git push
