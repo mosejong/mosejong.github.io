@@ -1,0 +1,37 @@
+name: Portfolio Copy Accuracy v1.5
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/copy-accuracy-v15.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Apply copy accuracy patch
+        run: python .github/scripts/copy_accuracy_v15.py
+
+      - name: Validate
+        run: |
+          git diff --check
+          grep -q "demo ready" index.html
+          grep -q "누적 8년 9개월" index.html
+          grep -q "team safety routing" projects/rainbow-bridge.html
+          grep -q "classification accuracy" projects/procurement-logistics-ai.html
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html projects
+          git commit -m "copy: tighten accuracy and ownership wording"
+          git push
