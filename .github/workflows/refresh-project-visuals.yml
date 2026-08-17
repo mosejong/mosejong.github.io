@@ -1,0 +1,64 @@
+name: Refresh Project Visuals
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/refresh-project-visuals.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  capture-and-refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout portfolio
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Prepare Chrome and folders
+        run: |
+          mkdir -p assets/projects
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          if [ -z "$CHROME" ]; then
+            echo "Chrome/Chromium not found"
+            exit 1
+          fi
+          echo "CHROME=$CHROME" >> "$GITHUB_ENV"
+
+      - name: Capture SchoolBridge UI flow
+        run: |
+          rm -rf /tmp/schoolbridge
+          git clone --depth 1 https://github.com/Maxmunzy/multicultural-ai.git /tmp/schoolbridge
+          cd /tmp/schoolbridge/android/design_reference
+          python3 -m http.server 8123 >/tmp/schoolbridge-http.log 2>&1 &
+          SERVER_PID=$!
+          sleep 3
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --hide-scrollbars --window-size=1440,900 --screenshot="$GITHUB_WORKSPACE/assets/projects/schoolbridge-parent.png" http://127.0.0.1:8123/parent.html
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --hide-scrollbars --window-size=1440,900 --screenshot="$GITHUB_WORKSPACE/assets/projects/schoolbridge-teacher.png" http://127.0.0.1:8123/teacher.html
+          kill "$SERVER_PID" || true
+
+      - name: Capture live procurement homepage
+        run: |
+          URL="https://procurement-logistics-ai-5qian47widxpcuqefpjipy.streamlit.app"
+          curl -L --retry 4 --retry-delay 4 --max-time 90 "$URL" >/dev/null 2>&1 || true
+          sleep 8
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --hide-scrollbars --window-size=1440,900 --virtual-time-budget=25000 --run-all-compositor-stages-before-draw --screenshot="$GITHUB_WORKSPACE/assets/projects/procurement-home.png" "$URL"
+          test -s "$GITHUB_WORKSPACE/assets/projects/procurement-home.png"
+
+      - name: Refresh portfolio cards
+        run: python scripts/refresh_school_procurement.py
+
+      - name: Commit screenshots and card redesign
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets/projects/schoolbridge-parent.png assets/projects/schoolbridge-teacher.png assets/projects/procurement-home.png
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git commit -m "feat: refresh SchoolBridge and procurement visuals"
+          git push
