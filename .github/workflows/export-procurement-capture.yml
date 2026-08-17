@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Upload capture
+      - name: Upload Korean-rendered capture
         uses: actions/upload-artifact@v4
         with:
-          name: procurement-live-capture
+          name: procurement-live-capture-ko
           path: assets/projects/procurement-home.png
           if-no-files-found: error
