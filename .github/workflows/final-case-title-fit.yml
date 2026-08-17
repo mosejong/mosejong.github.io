@@ -1,0 +1,41 @@
+name: Final Case Title Fit
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/final-case-title-fit.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  fit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Fit desktop hero titles
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('assets/case-study.css')
+          s = p.read_text(encoding='utf-8')
+          old = '.hero h1{font-size:clamp(58px,8vw,112px);line-height:.91;letter-spacing:-.075em;margin:13px 0 24px;font-weight:930}'
+          new = '.hero h1{font-size:clamp(56px,6.8vw,98px);line-height:.91;letter-spacing:-.075em;margin:13px 0 24px;font-weight:930}'
+          if old not in s:
+              raise SystemExit('desktop hero rule not found')
+          p.write_text(s.replace(old,new,1), encoding='utf-8')
+          PY
+          grep -q '6.8vw,98px' assets/case-study.css
+
+      - name: Remove workflow and commit
+        run: |
+          git rm .github/workflows/final-case-title-fit.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: fit long case study titles"
+          git push
