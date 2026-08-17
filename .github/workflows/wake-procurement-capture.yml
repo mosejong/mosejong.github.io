@@ -1,0 +1,123 @@
+name: Wake Procurement App and Refresh Capture
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/wake-procurement-capture.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  wake-and-capture:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout portfolio
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install Selenium
+        run: python -m pip install --quiet selenium
+
+      - name: Wake Streamlit and capture real homepage
+        env:
+          APP_URL: https://procurement-logistics-ai-5qian47widxpcuqefpjipy.streamlit.app
+        run: |
+          mkdir -p assets/projects
+          cat > /tmp/capture_procurement.py <<'PY'
+          import os, time
+          from pathlib import Path
+          from selenium import webdriver
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          url = os.environ['APP_URL']
+          out = Path(os.environ['GITHUB_WORKSPACE']) / 'assets/projects/procurement-home.png'
+
+          opts = Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--disable-gpu')
+          opts.add_argument('--window-size=1440,900')
+          opts.add_argument('--hide-scrollbars')
+
+          driver = webdriver.Chrome(options=opts)
+          wait = WebDriverWait(driver, 60)
+          try:
+              driver.get(url)
+              time.sleep(4)
+
+              # Streamlit Community Cloud sleep page: click wake-up button if present.
+              wake_texts = [
+                  "Yes, get this app back up!",
+                  "Get this app back up",
+                  "Wake up",
+              ]
+              clicked = False
+              for text in wake_texts:
+                  try:
+                      buttons = driver.find_elements(By.XPATH, f"//*[contains(normalize-space(.), '{text}')]")
+                      for el in buttons:
+                          if el.is_displayed():
+                              driver.execute_script("arguments[0].click();", el)
+                              clicked = True
+                              print('Clicked wake control:', text)
+                              break
+                  except Exception:
+                      pass
+                  if clicked:
+                      break
+
+              # Give the app time to boot, periodically refresh if the sleep page remains.
+              deadline = time.time() + 150
+              last = ''
+              while time.time() < deadline:
+                  time.sleep(5)
+                  body = driver.find_element(By.TAG_NAME, 'body').text
+                  last = body[:800]
+                  asleep = ('Zzzz' in body or 'gone to sleep' in body or 'get this app back up' in body.lower())
+                  streamlit_ready = ('stApp' in driver.page_source or 'data-testid="stApp"' in driver.page_source)
+                  if not asleep and streamlit_ready and len(body.strip()) > 40:
+                      print('Live Streamlit app detected.')
+                      break
+                  if asleep and not clicked:
+                      # Try once more after dynamic content settles.
+                      try:
+                          el = driver.find_element(By.XPATH, "//*[contains(normalize-space(.), 'get this app back up')]")
+                          driver.execute_script("arguments[0].click();", el)
+                          clicked = True
+                          print('Clicked wake control on retry.')
+                      except Exception:
+                          pass
+                  print('Waiting for app...')
+              else:
+                  raise RuntimeError('App did not become ready. Last body text: ' + last)
+
+              time.sleep(8)
+              driver.execute_script('window.scrollTo(0,0)')
+              time.sleep(2)
+              body = driver.find_element(By.TAG_NAME, 'body').text
+              if 'Zzzz' in body or 'gone to sleep' in body or 'get this app back up' in body.lower():
+                  raise RuntimeError('Refusing to save sleeping Streamlit screen')
+              driver.save_screenshot(str(out))
+              print('Saved live app capture:', out, out.stat().st_size)
+          finally:
+              driver.quit()
+          PY
+          python /tmp/capture_procurement.py
+
+      - name: Commit real homepage capture
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/projects/procurement-home.png
+          if git diff --cached --quiet; then
+            echo "No screenshot change"
+            exit 0
+          fi
+          git commit -m "fix: replace sleeping Streamlit capture with live dashboard"
+          git push
