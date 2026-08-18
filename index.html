@@ -478,7 +478,6 @@
     @media(max-width:980px){.project-real{grid-template-columns:1fr}.real-project-visual{border-left:0;border-top:1px solid rgba(255,255,255,.075);min-height:500px}}
     @media(max-width:680px){.project-real .project-copy{padding:25px 22px 28px}.real-project-visual{min-height:390px;padding:38px 15px 20px}.single-real-screen,.phone-demo,.live-frame-wrap{width:100%;height:320px;max-height:320px}.single-real-screen img{max-height:320px}.phone-demo img{height:100%}}
 
-
     /* Captured project visuals v4 */
     .school-capture-visual,.procurement-capture-visual{min-height:590px}
     .school-shot-stage{position:relative;z-index:2;width:100%;height:465px;display:flex;align-items:center;justify-content:center;perspective:1200px}
@@ -498,8 +497,6 @@
     .capture-open{position:absolute;right:13px;bottom:13px;padding:8px 10px;border-radius:9px;border:1px solid rgba(255,255,255,.15);background:rgba(7,10,15,.86);backdrop-filter:blur(9px);font:800 8px ui-monospace,SFMono-Regular,Menlo,monospace;color:#e4ebf2}
     @media(max-width:980px){.school-capture-visual,.procurement-capture-visual{min-height:530px}.school-shot-stage{height:420px}.browser-capture{height:410px}}
     @media(max-width:680px){.school-capture-visual,.procurement-capture-visual{min-height:400px}.school-shot-stage{height:305px}.school-shot{width:92%}.parent-shot{transform:translate(-18px,-14px)}.teacher-shot{width:68%;transform:translate(72px,82px) rotateZ(2deg)}.browser-capture{width:100%;height:310px}.browser-capture-bar{height:36px}.browser-capture-body{height:calc(100% - 36px)}}
-
-
 
     /* Portfolio v1.0 visual polish */
     .project-list{gap:24px}
@@ -602,7 +599,6 @@
       .dashboard-badges{left:8px;bottom:8px;max-width:72%}
     }
 
-
     /* PERF_V12_START */
     .media-video{width:100%;height:100%;display:block;object-fit:cover;object-position:center top;background:#0a0e14}
     .single-real-screen .media-video,.phone-demo .media-video{object-fit:contain}
@@ -610,7 +606,6 @@
 
     /* PERF_V12_A11Y */
     a:focus-visible,button:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
-
 
     /* v1.6 — recruiter scanability */
     .work-principles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:-2px 0 22px}
@@ -633,6 +628,47 @@
     @media(max-width:980px){.project:before{right:24px;top:18px}.work-principles{grid-template-columns:1fr 1fr}.work-principle:last-child{grid-column:span 2}}
     @media(max-width:680px){.work-principles{grid-template-columns:1fr}.work-principle:last-child{grid-column:auto}.work-principle{min-height:0}.scan-grid{grid-template-columns:1fr}.scan-grid .role-box{min-height:0}.project:before{font-size:68px;right:18px;top:13px}}
 
+    /* v1.7 — responsive typography / clipping defense */
+    .manifesto-title,.section-top h2,.project h3,.award-title,.cta h2{
+      word-break:keep-all;
+      overflow-wrap:break-word;
+    }
+    .metric,.role-box strong,.origin-note strong,.work-principle span,.time-content strong,.time-content p{
+      max-width:100%;
+      overflow-wrap:anywhere;
+    }
+    @media(max-width:980px){
+      .manifesto{min-height:auto;gap:34px}
+      .manifesto-title{font-size:clamp(36px,5.4vw,48px);line-height:1.09;letter-spacing:-.048em}
+    }
+    @media(max-width:680px){
+      .manifesto{padding:24px 20px;min-height:0;gap:24px}
+      .manifesto-title{font-size:clamp(29px,7vw,32px);line-height:1.13;letter-spacing:-.038em;margin-top:16px}
+      .manifesto p{margin:0;font-size:14px;line-height:1.72;word-break:keep-all;overflow-wrap:break-word}
+      .section-top h2{font-size:clamp(32px,9vw,40px);line-height:1.1;letter-spacing:-.043em}
+      .impact{font-size:clamp(36px,10.5vw,50px);line-height:1.05;letter-spacing:-.05em;overflow-wrap:anywhere}
+      .award-title{font-size:21px;line-height:1.23;letter-spacing:-.032em}
+      .project h3,.project-featured-real h3{font-size:clamp(33px,9.2vw,40px);line-height:1.08;letter-spacing:-.042em}
+      .project-copy p,.section-note,.bento-copy,.work-principle span{word-break:keep-all;overflow-wrap:break-word}
+      .metric{white-space:normal;line-height:1.45}
+      .scan-grid .role-box strong{line-height:1.55}
+      .origin-note strong{line-height:1.6}
+      .cta-box{min-height:0;padding:46px 18px}
+      .cta h2{font-size:clamp(30px,8.7vw,38px);line-height:1.12;letter-spacing:-.04em}
+      .node{grid-template-columns:36px minmax(0,1fr) auto;gap:10px;padding:14px}
+      .node-icon{width:36px;height:36px}
+      .node strong{font-size:12px;line-height:1.3}
+      .node small{font-size:9px;overflow-wrap:anywhere}
+      .node-state{font-size:9px;padding:5px 6px}
+    }
+    @media(max-width:420px){
+      .hero h1{font-size:clamp(31px,8.6vw,38px);line-height:1.1;letter-spacing:-.035em}
+      .manifesto-title{font-size:29px}
+      .project h3,.project-featured-real h3{font-size:clamp(31px,9vw,36px)}
+      .impact{font-size:clamp(34px,10vw,44px)}
+      .visual-caption{flex-wrap:wrap;justify-content:flex-end;line-height:1.4}
+    }
+
   </style>
 <!-- SEO_V11_START --><meta name="author" content="모세종"><link rel="canonical" href="https://mosejong.github.io/"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><meta property="og:type" content="website"><meta property="og:url" content="https://mosejong.github.io/"><meta property="og:image" content="https://mosejong.github.io/assets/og/portfolio.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="ko_KR"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="모세종 | Python · FastAPI AI 서비스 백엔드 개발자"><meta name="twitter:description" content="물류·운영 경험을 바탕으로 Python · FastAPI로 API, DB, AI 기능을 연결하고 테스트와 수치로 검증하는 AI 백엔드 개발자 모세종의 포트폴리오."><meta name="twitter:image" content="https://mosejong.github.io/assets/og/portfolio.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"모세종","url":"https://mosejong.github.io/","sameAs":["https://github.com/mosejong"],"jobTitle":"Python · FastAPI AI 서비스 백엔드 개발자","knowsAbout":["Python","FastAPI","PostgreSQL","Redis","RAG","LLM Integration","Docker","pytest","GitHub Actions"]}</script><!-- SEO_V11_END --></head>
 <body>
@@ -651,7 +687,6 @@
       </div>
     </div>
   </nav>
-
 
   <aside class="awards-dock" id="awardsDock" aria-label="Awards and certificates">
     <button class="awards-tab" id="awardsTab" type="button" aria-expanded="false" aria-controls="awardsPanel">
