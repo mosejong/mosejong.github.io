@@ -1,0 +1,54 @@
+name: Fact Defense Visual QA
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fact-defense-visual-qa.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Start local server
+        run: |
+          python3 -m http.server 8000 >/tmp/portfolio-http.log 2>&1 &
+          echo $! > /tmp/portfolio-http.pid
+          sleep 2
+
+      - name: Capture desktop and mobile
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser)"
+          echo "Chrome: $CHROME"
+          mkdir -p qa
+          "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --hide-scrollbars --window-size=1440,1000 --screenshot=qa/home-projects-desktop.png 'http://127.0.0.1:8000/index.html#projects'
+          "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --hide-scrollbars --window-size=390,844 --screenshot=qa/home-projects-mobile.png 'http://127.0.0.1:8000/index.html#projects'
+          "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --hide-scrollbars --window-size=1440,1000 --screenshot=qa/schoolbridge-desktop.png 'http://127.0.0.1:8000/projects/schoolbridge.html'
+          "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --hide-scrollbars --window-size=390,844 --screenshot=qa/schoolbridge-mobile.png 'http://127.0.0.1:8000/projects/schoolbridge.html'
+          "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --hide-scrollbars --window-size=1440,1000 --screenshot=qa/procurement-desktop.png 'http://127.0.0.1:8000/projects/procurement-logistics-ai.html'
+          "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage --hide-scrollbars --window-size=390,844 --screenshot=qa/procurement-mobile.png 'http://127.0.0.1:8000/projects/procurement-logistics-ai.html'
+          test "$(find qa -name '*.png' | wc -l)" -eq 6
+          ls -lh qa
+
+      - name: Upload QA screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: fact-defense-visual-qa
+          path: qa/*.png
+          retention-days: 2
+
+      - name: Remove temporary QA workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/fact-defense-visual-qa.yml
+          git add -A
+          git commit -m "chore: remove temporary visual QA workflow"
+          git push origin main
