@@ -133,7 +133,6 @@ jobs:
 '''
           css.write_text(ctext, encoding='utf-8')
 
-          # Static safety checks.
           assert 'manifesto-line' in text
           assert 'v1.7 — responsive typography / clipping defense' in text
           assert 'v1.7 — mobile typography / clipping defense' in ctext
@@ -199,3 +198,5 @@ jobs:
           git diff --cached --check
           git commit -m "fix: prevent responsive typography clipping"
           git push origin main
+
+# registered-trigger
