@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -23,6 +23,37 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: One-time recruiter copy polish
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          replacements = [
+              ('AI 백엔드 개발자 모세종의 포트폴리오.', 'AI 서비스 백엔드 개발자 모세종의 포트폴리오.'),
+              ('AI 백엔드 개발자 포트폴리오.', 'AI 서비스 백엔드 개발자 포트폴리오.'),
+              ('<div class="role-box proof"><small>VALIDATION</small><strong>564 project backend tests</strong></div>', '<div class="role-box proof"><small>PROJECT TESTS</small><strong>564 project backend tests</strong></div>'),
+              ('PYTHON · FASTAPI · AI BACKEND · SEOUL', 'PYTHON · FASTAPI · AI SERVICE BACKEND · SEOUL'),
+          ]
+          changed = False
+          for old, new in replacements:
+              if old in text:
+                  text = text.replace(old, new)
+                  changed = True
+          if changed:
+              p.write_text(text, encoding='utf-8')
+          PY
+          if ! git diff --quiet -- index.html; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add index.html
+            git diff --cached --check
+            git commit -m "copy: finalize recruiter-facing labels"
+            git push origin main
+          fi
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
