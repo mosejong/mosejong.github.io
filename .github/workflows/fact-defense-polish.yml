@@ -1,0 +1,159 @@
+name: Portfolio Fact Defense Polish
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fact-defense-polish.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Patch fact wording
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_exact(path, old, new, expected=1):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              found = text.count(old)
+              if found != expected:
+                  raise SystemExit(f'{path}: expected {expected} occurrence(s), found {found}: {old[:100]!r}')
+              p.write_text(text.replace(old, new), encoding='utf-8')
+              print(f'OK {path}: {old[:60]!r}')
+
+          # Home — only fact/wording hardening, no layout changes.
+          replace_exact(
+              'index.html',
+              '<h2>설명보다<br>숫자로 증명합니다.</h2>',
+              '<h2>설명만 하지 않고,<br>수치로 검증합니다.</h2>'
+          )
+          replace_exact(
+              'index.html',
+              '<div><div class="bento-label">SchoolBridge</div><div class="award-title">번역 품질<br>39.0 → 89.6</div></div>',
+              '<div><div class="bento-label">SchoolBridge</div><div class="award-title">내부 번역 평가<br>39.0 → 89.6</div></div>'
+          )
+          replace_exact(
+              'index.html',
+              'NLLB 번역·학교 용어사전·번역 검수 루프·Edge-TTS</b>를 맡아 번역 품질을 39.0 → 89.6으로 개선했습니다.',
+              'NLLB 번역·학교 용어사전·번역 검수 루프·Edge-TTS</b>를 맡아 Gemini 루브릭 기반 내부 번역 평가를 39.0 → 89.6으로 개선했습니다.'
+          )
+          replace_exact(
+              'index.html',
+              '<div class="role-box signal"><small>KEY RESULT</small><strong>번역 품질 39.0 → 89.6</strong></div>',
+              '<div class="role-box signal"><small>KEY RESULT</small><strong>내부 번역 평가 39.0 → 89.6</strong></div>'
+          )
+          replace_exact(
+              'index.html',
+              '<div class="role-box signal"><small>KEY RESULT</small><strong>Classification accuracy 98.6%</strong></div>',
+              '<div class="role-box signal"><small>KEY RESULT</small><strong>Rule-label holdout accuracy 98.6%</strong></div>'
+          )
+          replace_exact(
+              'index.html',
+              '<div class="role-box proof"><small>VALIDATION</small><strong>100,083 G2B bid records</strong></div>',
+              '<div class="role-box proof"><small>VALIDATION</small><strong>15% stratified holdout</strong></div>'
+          )
+          replace_exact(
+              'index.html',
+              '<div class="project-metrics supporting-metrics">\n        <span class="metric">aT bid + award <b>734,242</b></span>\n        <span class="metric">data sources <b>6 agencies / 9 sources</b></span>',
+              '<div class="project-metrics supporting-metrics">\n        <span class="metric">g2b bids <b>100,083</b></span>\n        <span class="metric">aT bid + award <b>734,242</b></span>\n        <span class="metric">data sources <b>6 agencies / 9 sources</b></span>'
+          )
+          replace_exact(
+              'index.html',
+              '서비스 흐름, API 통합, 배포, 안전성 평가, 팀 개발 운영.',
+              '서비스 흐름, API 통합, 배포, 회복 게이트, 팀 개발 운영.'
+          )
+          replace_exact(
+              'index.html',
+              '<strong>Python · FastAPI AI Backend</strong>',
+              '<strong>Python · FastAPI AI 서비스 백엔드</strong>'
+          )
+
+          # SchoolBridge case — disclose evaluation method and rubric.
+          replace_exact(
+              'projects/schoolbridge.html',
+              '<small>translation quality</small><strong>39.0 → 89.6</strong><p>용어사전 전·후 엄격 재평가</p>',
+              '<small>internal rubric score</small><strong>39.0 → 89.6</strong><p>Gemini 루브릭 · 학교 문맥/정보 보존/Round-trip</p>'
+          )
+          replace_exact(
+              'projects/schoolbridge.html',
+              '<strong>번역 품질 평가</strong><span>현지 표현, 학교 문맥, 정보 보존, Round-trip을 함께 보는 평가 루프</span>',
+              '<strong>Gemini 루브릭 기반 번역 평가</strong><span>현지 표현, 학교 문맥, 정보 보존, Round-trip을 함께 보는 자동 평가 루프</span>'
+          )
+          replace_exact(
+              'projects/schoolbridge.html',
+              '평가 기준을 단순 BLEU류 점수가 아니라 학교 공지 사용 맥락의 문맥·정보 보존·상용 표현까지 넓혀 개선 전후를 비교했습니다.',
+              'Gemini 자동 채점 루브릭을 강화해 학교 문맥·정보 보존·현지 상용 표현·Round-trip을 함께 평가하고 개선 전후를 비교했습니다.'
+          )
+          replace_exact(
+              'projects/schoolbridge.html',
+              'NLLB 기본 번역 → 학교 용어사전 적용 후 엄격 재평가',
+              'Gemini 자동 루브릭 · NLLB 기본 번역 → 학교 용어사전 적용'
+          )
+
+          # Procurement case — disclose rule-generated labels and holdout protocol.
+          replace_exact(
+              'projects/procurement-logistics-ai.html',
+              '<small>classification accuracy</small><strong>98.6%</strong><p>TF-IDF + Logistic Regression</p>',
+              '<small>rule-label holdout</small><strong>98.6%</strong><p>15% stratified holdout · rule-generated labels</p>'
+          )
+          replace_exact(
+              'projects/procurement-logistics-ai.html',
+              '<h2>데이터 규모와 모델 성능을<br>함께 검증했습니다.</h2>',
+              '<h2>데이터 규모와 분류 재현성을<br>함께 확인했습니다.</h2>'
+          )
+          replace_exact(
+              'projects/procurement-logistics-ai.html',
+              '전국 범위를 확보하면서도 분류 품질과 지역 매칭 범위를 숫자로 관리했습니다.',
+              '전국 범위를 확보하면서, 키워드 규칙으로 생성한 라벨을 기준으로 15% stratified holdout에서 ML fallback의 일치도를 확인했습니다.'
+          )
+
+          p = Path('projects/procurement-logistics-ai.html')
+          text = p.read_text(encoding='utf-8')
+          pattern = re.compile(r'<div class="result"><strong><em>98\.6%</em></strong><span>.*?</span></div>')
+          replacement = '<div class="result"><strong><em>98.6%</em></strong><span>키워드 규칙 생성 라벨 기준 · 15% stratified holdout · TF-IDF + Logistic Regression</span></div>'
+          text2, n = pattern.subn(replacement, text, count=1)
+          if n != 1:
+              raise SystemExit(f'projects/procurement-logistics-ai.html: expected one 98.6% result block, replaced {n}')
+          p.write_text(text2, encoding='utf-8')
+          print('OK procurement validation result block')
+
+          # Assertions: stale risky wording must be gone from the relevant surfaces.
+          home = Path('index.html').read_text(encoding='utf-8')
+          school = Path('projects/schoolbridge.html').read_text(encoding='utf-8')
+          proc = Path('projects/procurement-logistics-ai.html').read_text(encoding='utf-8')
+          checks = [
+              ('home old claim', '숫자로 증명합니다.' not in home),
+              ('home school metric', '내부 번역 평가 39.0 → 89.6' in home),
+              ('home proc protocol', 'Rule-label holdout accuracy 98.6%' in home and '15% stratified holdout' in home),
+              ('home rainbow role', '배포, 회복 게이트, 팀 개발 운영.' in home),
+              ('home role title', 'Python · FastAPI AI 서비스 백엔드' in home),
+              ('school rubric disclosed', 'Gemini 자동 채점 루브릭' in school and 'internal rubric score' in school),
+              ('proc labels disclosed', 'rule-generated labels' in proc and '키워드 규칙 생성 라벨 기준' in proc),
+          ]
+          failed = [name for name, ok in checks if not ok]
+          if failed:
+              raise SystemExit('ASSERTION FAILED: ' + ', '.join(failed))
+          print('FACT DEFENSE VALIDATION PASS')
+          PY
+
+      - name: Show diff
+        run: git diff --check && git diff --stat && git diff -- index.html projects/schoolbridge.html projects/procurement-logistics-ai.html
+
+      - name: Commit polish and remove temporary workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/fact-defense-polish.yml
+          git add -A
+          git commit -m "fix: harden portfolio metric claims"
+          git push origin main
