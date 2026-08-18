@@ -1,0 +1,58 @@
+name: Final Copy Polish
+
+on:
+  push:
+    paths:
+      - '.github/workflows/final-copy-polish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Patch recruiter-facing labels
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+
+          replacements = [
+              ('AI 백엔드 개발자 모세종의 포트폴리오.', 'AI 서비스 백엔드 개발자 모세종의 포트폴리오.'),
+              ('AI 백엔드 개발자 포트폴리오.', 'AI 서비스 백엔드 개발자 포트폴리오.'),
+              ('<div class="role-box proof"><small>VALIDATION</small><strong>564 project backend tests</strong></div>', '<div class="role-box proof"><small>PROJECT TESTS</small><strong>564 project backend tests</strong></div>'),
+              ('PYTHON · FASTAPI · AI BACKEND · SEOUL', 'PYTHON · FASTAPI · AI SERVICE BACKEND · SEOUL'),
+          ]
+
+          for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'expected exactly 1 occurrence: {old!r}, got {count}')
+              text = text.replace(old, new)
+
+          # Twitter description contains the same longer phrase and is intentionally covered
+          # by the first replacement only if exact. Verify no stale role phrase remains in SEO text.
+          stale = 'AI 백엔드 개발자 모세종의 포트폴리오.'
+          if stale in text:
+              raise SystemExit('stale SEO role phrase remains')
+
+          p.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit and self-clean
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/final-copy-polish.yml
+          git add index.html .github/workflows/final-copy-polish.yml
+          git diff --cached --check
+          git commit -m "copy: finalize recruiter-facing labels"
+          git push origin main
