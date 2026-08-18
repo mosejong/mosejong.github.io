@@ -1,0 +1,96 @@
+name: Fact Defense DOM QA Cleanup
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fact-defense-dom-qa-cleanup.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  qa-clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Start local server
+        run: |
+          python3 -m http.server 8000 >/tmp/portfolio-http.log 2>&1 &
+          sleep 2
+
+      - name: Install browser driver
+        run: npm install puppeteer-core@24 --no-save --no-package-lock
+
+      - name: DOM overflow QA
+        run: |
+          cat > /tmp/qa.mjs <<'JS'
+          import puppeteer from 'puppeteer-core';
+          import { execSync } from 'node:child_process';
+
+          const chrome = execSync('command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser', {encoding:'utf8', shell:'/bin/bash'}).trim();
+          const browser = await puppeteer.launch({headless:true, executablePath:chrome, args:['--no-sandbox','--disable-dev-shm-usage']});
+
+          const cases = [
+            ['home desktop', 'http://127.0.0.1:8000/index.html#projects', 1440, 1000, ['#projects','.project-school','.project-procurement','.project-procurement .role-grid','.project-procurement .project-metrics']],
+            ['home mobile', 'http://127.0.0.1:8000/index.html#projects', 390, 844, ['#projects','.project-school','.project-procurement','.project-procurement .role-grid','.project-procurement .project-metrics']],
+            ['school desktop', 'http://127.0.0.1:8000/projects/schoolbridge.html', 1440, 1000, ['.hero h1','.stats','.stat','#results']],
+            ['school mobile', 'http://127.0.0.1:8000/projects/schoolbridge.html', 390, 844, ['.hero h1','.stats','.stat','#results']],
+            ['proc desktop', 'http://127.0.0.1:8000/projects/procurement-logistics-ai.html', 1440, 1000, ['.hero h1','.stats','.stat','#results']],
+            ['proc mobile', 'http://127.0.0.1:8000/projects/procurement-logistics-ai.html', 390, 844, ['.hero h1','.stats','.stat','#results']],
+          ];
+
+          let failed = false;
+          for (const [name,url,w,h,selectors] of cases) {
+            const page = await browser.newPage();
+            await page.setViewport({width:w,height:h,deviceScaleFactor:1});
+            await page.goto(url,{waitUntil:'domcontentloaded'});
+            await new Promise(r=>setTimeout(r,350));
+            const result = await page.evaluate((selectors)=>{
+              const root = document.documentElement;
+              const overflow = root.scrollWidth - window.innerWidth;
+              const details = [];
+              for (const sel of selectors) {
+                for (const el of document.querySelectorAll(sel)) {
+                  const r = el.getBoundingClientRect();
+                  const cs = getComputedStyle(el);
+                  details.push({sel, left:Math.round(r.left), right:Math.round(r.right), width:Math.round(r.width), clientWidth:el.clientWidth, scrollWidth:el.scrollWidth, overflowX:cs.overflowX});
+                }
+              }
+              return {innerWidth:window.innerWidth, scrollWidth:root.scrollWidth, overflow, details};
+            }, selectors);
+            console.log('\n['+name+']', JSON.stringify(result,null,2));
+            if (result.overflow > 1) {
+              console.error('FAIL horizontal overflow:', name, result.overflow);
+              failed = true;
+            }
+            for (const d of result.details) {
+              if (d.right > result.innerWidth + 2 || d.left < -2) {
+                console.error('FAIL key element outside viewport:', name, d);
+                failed = true;
+              }
+              if (d.overflowX !== 'visible' && d.scrollWidth > d.clientWidth + 2) {
+                console.error('FAIL clipped key element:', name, d);
+                failed = true;
+              }
+            }
+            await page.close();
+          }
+          await browser.close();
+          if (failed) process.exit(1);
+          console.log('\nDOM QA PASS — desktop/mobile horizontal overflow and key-element clipping checks passed.');
+          JS
+          node /tmp/qa.mjs
+
+      - name: Clean temporary QA files and workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-files --error-unmatch qa >/dev/null 2>&1; then
+            git rm -r qa
+          fi
+          git rm .github/workflows/fact-defense-dom-qa-cleanup.yml
+          git commit -m "chore: clean temporary portfolio QA artifacts"
+          git push origin main
